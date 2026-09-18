@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS Resume Builder + Scorer — DevClo</title>
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<header>
+  <h1>ATS Resume Builder + Scorer</h1>
+  <p class="sub">Generates an ATS-safe resume PDF <b>or</b> uploads your existing one, then simulates how Workday, Taleo, Lever, iCIMS &amp; Greenhouse parse and score it. Runs locally.</p>
+</header>
+
+<nav class="tabs">
+  <button class="tab active" id="tab-upload" onclick="switchTab('upload')">Upload &amp; Score</button>
+  <button class="tab" id="tab-build" onclick="switchTab('build')">Build Resume</button>
+</nav>
+
+<main class="layout">
+  <!-- ---------------- UPLOAD MODE ---------------- -->
+  <section class="panel mode" id="mode-upload">
+    <h2>Upload your resume</h2>
+    <label class="drop" id="drop">
+      <input type="file" id="file" accept=".pdf" hidden>
+      <span id="drop-label">Click to choose a PDF resume<br><small>max 2.5 MB<br>text-based PDF (not scanned/image)</small></span>
+    </label>
+    <div id="file-info" class="file-info" hidden></div>
+    <label>Job description
+      <textarea id="jd-upload" rows="18" placeholder="Paste the full job description. Keyword &amp; platform scores are computed against this."></textarea>
+    </label>
+    <div class="actions">
+      <button class="primary" onclick="runUpload()" id="btn-upload">Score resume</button>
+      <span id="status-upload" class="status"></span>
+    </div>
+  </section>
+
+  <!-- ---------------- BUILD MODE ---------------- -->
+  <section class="panel mode" id="mode-build" hidden>
+    <h2>1. Resume details</h2>
+    <div class="grid-2">
+      <label>Full name <input id="name" placeholder="Jane Doe"></label>
+      <label>Job title <input id="job_title" placeholder="DevOps Engineer"></label>
+      <label>Email <input id="email" placeholder="jane@email.com"></label>
+      <label>Phone <input id="phone" placeholder="+1 555 000 1234"></label>
+      <label>Location <input id="location" placeholder="Austin, TX"></label>
+      <label>LinkedIn <input id="linkedin" placeholder="linkedin.com/in/janedoe"></label>
+      <label>GitHub <input id="github" placeholder="github.com/janedoe"></label>
+    </div>
+
+    <label>Professional summary
+      <textarea id="summary" rows="3" placeholder="DevOps engineer with 5 years ..."></textarea>
+    </label>
+    <label>Skills (one per line)
+      <textarea id="skills" rows="4" placeholder="AWS&#10;Docker&#10;Kubernetes&#10;Terraform&#10;CI/CD"></textarea>
+    </label>
+
+    <h3>Work experience</h3>
+    <div id="exp-rows"></div>
+    <button type="button" class="add-btn" onclick="addRow('exp')">+ Add experience</button>
+
+    <h3>Education</h3>
+    <div id="edu-rows"></div>
+    <button type="button" class="add-btn" onclick="addRow('edu')">+ Add education</button>
+
+    <label>Certifications (one per line)
+      <textarea id="certifications" rows="3" placeholder="AWS Certified Solutions Architect"></textarea>
+    </label>
+    <label>Projects (optional, one per line)
+      <textarea id="projects" rows="3" placeholder="Project name - what it does"></textarea>
+    </label>
+
+    <h2>2. Job description</h2>
+    <label>Paste the job description
+      <textarea id="jd-build" rows="10" placeholder="Paste the job description here. Keyword match is computed against this text."></textarea>
+    </label>
+    <div class="actions">
+      <button class="primary" onclick="runBuild()" id="btn-build">Generate &amp; Score</button>
+      <span id="status-build" class="status"></span>
+    </div>
+  </section>
+
+  <!-- ---------------- RESULTS ---------------- -->
+  <section class="panel results-panel" id="results" hidden>
+    <h2>3. Results</h2>
+    <div class="topline">
+      <span id="dlwrap"><a id="dl" class="download" href="#">Download PDF</a></span>
+      <span id="gen-time" class="muted"></span>
+    </div>
+
+    <div id="optimize-wrap" class="optimize" hidden>
+      <button class="primary" onclick="runOptimize()" id="btn-optimize">Auto-fix resume for this job &amp; re-score</button>
+      <span id="status-optimize" class="status"></span>
+    </div>
+    <div id="optimize-result"></div>
+
+    <div class="summary-cards" id="summary-cards"></div>
+
+    <h3>Parseability <span class="muted">(format - the binary gate, should be ~100)</span></h3>
+    <div id="parse-checks" class="checks"></div>
+
+    <h3>Simulated platform scores <span class="muted">(content match - the honest 60-85%)</span></h3>
+    <div id="platforms" class="platforms"></div>
+
+    <h3>Profile extracted (what a parser would store)</h3>
+    <pre id="profile" class="raw"></pre>
+
+    <h3>What the ATS sees (raw parsed text)</h3>
+    <pre id="raw-text" class="raw"></pre>
+
+    <h3>Missing keywords from the job description</h3>
+    <div id="missing" class="missing"></div>
+    <p class="muted note" id="honesty-note"></p>
+  </section>
+</main>
+
+<script>
+const $ = x => document.getElementById(x);
+let expCount = 0, eduCount = 0, pickedFile = null, lastBuildPayload = null;
+
+function switchTab(mode) {
+  $('mode-' + mode).hidden = false;
+  $('mode-' + (mode === 'build' ? 'upload' : 'build')).hidden = true;
+  $('tab-' + mode).classList.add('active');
+  $('tab-' + (mode === 'build' ? 'upload' : 'build')).classList.remove('active');
+  if ($('results')) $('results').hidden = true;
+}
+
+$('file').addEventListener('change', e => {
+  pickedFile = e.target.files[0];
+  if (!pickedFile) return;
+  const mb = (pickedFile.size / 1024 / 1024).toFixed(1);
+  $('file-info').hidden = false;
+  $('file-info').textContent = `${pickedFile.name} (${mb} MB)`;
+  $('drop-label').innerHTML = `<b>${pickedFile.name}</b><br>${mb} MB`;
+});
+
+function addRow(kind) {
+  const box = $((kind === 'exp') ? 'exp-rows' : 'edu-rows');
+  if (kind === 'exp') {
+    const i = expCount++;
+    box.insertAdjacentHTML('beforeend', `
+      <div class="exp-card">
+        <div class="grid-2">
+          <input placeholder="Role" data-exp-role="${i}">
+          <input placeholder="Company" data-exp-company="${i}">
+          <input placeholder="Start (MM YYYY)" data-exp-start="${i}">
+          <input placeholder="End (MM YYYY)" data-exp-end="${i}">
+        </div>
+        <textarea placeholder="Bullet points (one per line) - lead with outcomes, mention the JD's tech" data-exp-bullets="${i}" rows="3"></textarea>
+        <button class="rm" onclick="this.parentNode.remove()">Remove</button>
+      </div>`);
+  } else {
+    const i = eduCount++;
+    box.insertAdjacentHTML('beforeend', `
+      <div class="exp-card">
+        <div class="grid-2">
+          <input placeholder="Institution" data-edu-inst="${i}">
+          <input placeholder="Degree" data-edu-degree="${i}">
+          <input placeholder="Start" data-edu-start="${i}">
+          <input placeholder="End" data-edu-end="${i}">
+        </div>
+        <button class="rm" onclick="this.parentNode.remove()">Remove</button>
+      </div>`);
+  }
+}
+
+function collectExp() {
+  const out = [];
+  document.querySelectorAll('#exp-rows > .exp-card').forEach(card => {
+    const r = card.querySelector('[data-exp-role]');
+    if (r && r.value.trim()) out.push({
+      role: r.value.trim(),
+      company: card.querySelector('[data-exp-company]')?.value.trim() || '',
+      start: card.querySelector('[data-exp-start]')?.value.trim() || '',
+      end: card.querySelector('[data-exp-end]')?.value.trim() || '',
+      bullets: (card.querySelector('[data-exp-bullets]')?.value || '').split('\n').map(s => s.trim()).filter(Boolean),
+    });
+  });
+  return out;
+}
+function collectEdu() {
+  const out = [];
+  document.querySelectorAll('#edu-rows > .exp-card').forEach(card => {
+    const d = card.querySelector('[data-edu-degree]');
+    if (d && d.value.trim()) out.push({
+      institution: card.querySelector('[data-edu-inst]')?.value.trim() || '',
+      degree: d.value.trim(),
+      start: card.querySelector('[data-edu-start]')?.value.trim() || '',
+      end: card.querySelector('[data-edu-end]')?.value.trim() || '',
+    });
+  });
+  return out;
+}
+function lines(id) { return ($(id).value || '').split('\n').map(s => s.trim()).filter(Boolean); }
+
+async function post(url, opts) {
+  $('results').hidden = true;
+  const btn = opts.btn; btn.disabled = true; opts.status.textContent = 'Working...';
+  try {
+    const r = await fetch(url, opts.init);
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    render(d);
+    opts.status.textContent = 'Done';
+  } catch (e) { opts.status.textContent = 'Error: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+async function runUpload() {
+  if (!pickedFile) { $('status-upload').textContent = 'Choose a PDF first'; return; }
+  lastBuildPayload = null;
+  $('optimize-wrap').hidden = true;
+  const fd = new FormData();
+  fd.append('file', pickedFile);
+  fd.append('job_description', $('jd-upload').value);
+  await post('/upload', {
+    btn: $('btn-upload'), status: $('status-upload'),
+    init: { method: 'POST', body: fd },
+  });
+}
+
+async function runBuild() {
+  if (!$('name').value.trim()) { $('status-build').textContent = 'Name required'; return; }
+  lastBuildPayload = {
+    resume: {
+      name: $('name').value, job_title: $('job_title').value,
+      email: $('email').value, phone: $('phone').value,
+      location: $('location').value, linkedin: $('linkedin').value, github: $('github').value,
+      summary: $('summary').value, skills: lines('skills'),
+      experience: collectExp(), education: collectEdu(),
+      certifications: lines('certifications'), projects: $('projects').value,
+    },
+    job_description: $('jd-build').value,
+  };
+  await post('/build', {
+    btn: $('btn-build'), status: $('status-build'),
+    init: {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lastBuildPayload),
+    },
+  });
+}
+
+async function runOptimize() {
+  if (!lastBuildPayload) { $('status-optimize').textContent = 'Build a resume first'; return; }
+  const btn = $('btn-optimize');
+  const status = $('status-optimize');
+  btn.disabled = true; status.textContent = 'Rewording resume to match the job...';
+  try {
+    const r = await fetch('/optimize', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...lastBuildPayload, threshold: 60 }),
+    });
+    const d = await r.json();
+    if (d.error) throw new Error(d.error);
+    if (d.optimized) {
+      $('dl').href = d.download_url;
+      $('gen-time').textContent = 'Optimized ' + d.generated_at;
+      const b = d.before, a = d.after;
+      const row = (label, x, y) => `<tr><td>${label}</td><td>${hscore(x)}</td><td>→</td><td>${hscore(y)}</td></tr>`;
+      $('optimize-result').innerHTML = `
+        <div class="opt-card">
+          <h3>Auto-fix done ✅&nbsp; <span class="score ${a.overall >= 70 ? 'green' : a.overall >= 60 ? 'amber' : 'red'}">${a.overall}/100</span>
+            <span class="muted">(${d.delta >= 0 ? '+' : ''}${d.delta}pts) · download the new PDF above</span></h3>
+          <p class="muted note">Same facts, your skills, phrased to match this JD. New JD phrases added:
+            <b>${(d.added_terms || []).join(', ') || 'none'}</b></p>
+          <table class="opt-table">
+            ${row('Overall', b.overall, a.overall)}
+            ${row('Keyword match', b.keyword, a.keyword)}
+            ${row('Workday', b.platforms.workday, a.platforms.workday)}
+            ${row('Taleo', b.platforms.taleo, a.platforms.taleo)}
+            ${row('Lever', b.platforms.lever, a.platforms.lever)}
+            ${row('iCIMS', b.platforms.icims, a.platforms.icims)}
+          </table>
+        </div>`;
+    } else {
+      $('optimize-result').innerHTML = `<div class="opt-card"><h3>No fixing needed ✅</h3><p>${d.reason}</p></div>`;
+    }
+    status.textContent = 'Done';
+  } catch (e) { status.textContent = 'Error: ' + e.message; }
+  finally { btn.disabled = false; }
+}
+
+function hscore(s) {
+  const c = s >= 85 ? 'green' : s >= 70 ? 'amber' : 'red';
+  return `<span class="score ${c}">${s}</span>`;
+}
+
+function render(d) {
+  $('results').hidden = false;
+  $('dl').href = d.download_url;
+  $('gen-time').textContent = 'Generated ' + d.generated_at;
+
+  const p = d.parse, s = d.scores;
+  const overall = Math.round(p.score * 0.35 + s.exact_coverage * 0.65);
+  $('summary-cards').innerHTML = `
+    <div class="card" style="border-color:${overall>=70?'#86efac':overall>=50?'#fcd34d':'#fca5a5'}">
+      <div class="label">Overall score</div><div class="num" style="font-size:26px;font-weight:800;color:${overall>=70?'var(--green)':overall>=50?'var(--amber)':'var(--red)'}">${overall}<span style="font-size:14px">/100</span></div>
+      <div class="tag">parse 35% + content 65%</div></div>
+    <div class="card"><div class="label">Parseability</div>${hscore(p.score)}<div class="tag">${p.fatal ? 'PARSE FAIL' : 'PASSES PARSING'}</div></div>
+    <div class="card"><div class="label">Exact keyword match</div>${hscore(s.exact_coverage)}</div>
+    <div class="card"><div class="label">Skills matched vs JD</div>${hscore(s.skill_stats.ratio)}<div class="tag">${s.skill_stats.matched}/${s.skill_stats.jd} skills</div></div>
+    <div class="card"><div class="label">Words extracted</div><div class="num" style="font-size:20px;font-weight:800">${d.word_count}</div></div>`;
+
+  $('parse-checks').innerHTML = p.checks.map(c => `
+    <div class="check ${c.pass ? 'ok' : 'bad'}">
+      <span class="glyph">${c.pass ? '&#10003;' : '&#10007;'}</span>
+      <div><strong>${c.label}</strong><div class="detail">${c.detail}</div></div>
+    </div>`).join('');
+
+  const order = ['workday', 'taleo', 'lever', 'icims', 'greenhouse'];
+  const names = { workday: 'Workday', taleo: 'Oracle Taleo', lever: 'Lever', icims: 'iCIMS', greenhouse: 'Greenhouse' };
+  $('platforms').innerHTML = order.map(id => {
+    const pl = s.platforms[id];
+    return `<div class="plat"><div class="plat-head"><strong>${names[id]}</strong>${pl.score === null ? '<span class="score na">N/A</span>' : hscore(pl.score)}</div><div class="plat-note">${pl.note}</div></div>`;
+  }).join('');
+
+  $('profile').textContent = JSON.stringify(d.parsed_profile, null, 2);
+  $('raw-text').textContent = d.raw_text || '(no text extracted)';
+
+  const miss = s.missing_keywords;
+  const parts = [];
+  if (miss.skills.length) parts.push(`<div class="miss-group"><strong>JD skills not on resume:</strong><div class="tags">${miss.skills.map(x => `<span class="tag bad">${x}</span>`).join('')}</div></div>`);
+  if (miss.tokens.length) parts.push(`<div class="miss-group"><strong>Top JD terms not found:</strong><div class="tags">${miss.tokens.slice(0, 15).map(x => `<span class="tag bad">${x}</span>`).join('')}</div></div>`);
+  $('missing').innerHTML = parts.length ? parts.join('') : `<div class="ok-text">No obvious keyword gaps.</div>`;
+
+  $('honesty-note').textContent = s.honesty_note;
+
+  $('optimize-result').innerHTML = '';
+  $('optimize-wrap').hidden = !(lastBuildPayload && overall < 60);
+}
+
+addRow('exp'); addRow('edu');
+</script>
+</body>
+</html>

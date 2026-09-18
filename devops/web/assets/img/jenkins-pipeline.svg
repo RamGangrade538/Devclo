@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 150" width="100%" style="background:#fbfbfc;border:1px solid #e6e8ef;border-radius:12px;font-family:'Inter','Segoe UI',system-ui,sans-serif" role="img" aria-label="Jenkins Pipeline Flow">
+<rect width="860" height="150" fill="#fbfbfc"/>
+<text x="30" y="26" font-size="19" font-weight="800" fill="#0f172a">Jenkins Pipeline Flow</text>
+<text x="30" y="46" font-size="12.5" fill="#64748b">Real-world pipeline: code se deploy tak ke stages</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<rect x="30" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="90" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Checkout</text>
+<text x="90" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">SCM sync</text>
+<rect x="166" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="226" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Build</text>
+<text x="226" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">compile</text>
+<rect x="302" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="362" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Test</text>
+<text x="362" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">junit</text>
+<rect x="438" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="498" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Package</text>
+<text x="498" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">artifact/image</text>
+<rect x="574" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="634" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Deploy</text>
+<text x="634" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">stage env</text>
+<rect x="710" y="62" width="120" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="770" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Post</text>
+<text x="770" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">report/cleanup</text>
+</svg>

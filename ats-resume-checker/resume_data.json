@@ -1,0 +1,105 @@
+{
+  "name": "RAM GANGRADE",
+  "job_title": "SDET / QA Automation Engineer",
+  "email": "gangraderam538@gmail.com",
+  "phone": "+91 74155 45448",
+  "location": "Indore, India",
+  "linkedin": "linkedin.com/in/ramgangrade",
+  "github": "github.com/RamGangrade538",
+  "summary": "SDET / QA Automation Engineer with 4+ years driving measurable quality gains - 60% lower regression effort, 40% higher automation coverage, and 15% fewer production defects - by designing and maintaining reusable test automation frameworks in Java with Selenium WebDriver, Playwright, Cypress, RestAssured, TestNG, and JUnit for web, API, and mobile applications. Builds and runs regression and end-to-end suites in CI/CD pipelines (Jenkins, GitHub Actions, GitLab CI/CD), containerizes test environments with Docker within Agile/Scrum teams, and validates releases to reduce production defects. Deep working knowledge of FinTech, Banking, Healthcare, SaaS, and GenAI domains, applying regulatory and compliance-aware testing across financial, banking, and healthcare workflows. Progressive track record advancing from QA Engineer to Senior SDET across four roles.",
+  "skills": [
+    "Languages: Java, JavaScript, SQL",
+    "Automation: Selenium WebDriver, Playwright, Cypress, Appium, BrowserStack, Sauce Labs",
+    "API Testing: RestAssured, Postman, REST API Automation",
+    "Testing Frameworks: TestNG, JUnit, Cucumber (BDD), Gherkin, Mocha, Page Object Model, Data-Driven, Hybrid",
+    "Performance Testing: JMeter",
+    "CI/CD & DevOps: Jenkins, GitHub Actions, GitLab CI/CD, Docker, Kubernetes, Maven, Gradle",
+    "Database: SQL",
+    "Version Control: Git, GitHub, Bitbucket",
+    "Testing Methodologies: Agile, Scrum, BDD, Functional, Regression, Smoke, Integration, End-to-End, Mobile, Cross-Browser",
+    "Domains: FinTech, Banking, Healthcare, SaaS, GenAI"
+  ],
+  "experience": [
+    {
+      "role": "Senior Automation Test Engineer (SDET)",
+      "company": "Emorphis Technology",
+      "start": "Jul 2024",
+      "end": "Present",
+      "bullets": [
+        "Drove a 60% drop in regression execution effort and faster release validation by architecting scalable, reusable test automation frameworks with Java, TestNG, JUnit, and Selenium WebDriver for a SaaS application spanning server- and client-side systems.",
+        "Removed manual test orchestration by running test suites inside containerized Docker setups and orchestrating execution across Jenkins, GitHub Actions, and GitLab CI/CD pipelines.",
+        "Guaranteed stable weekly releases by diagnosing and resolving CI/CD pipeline failures while sustaining reliable, high-availability regression execution.",
+        "Cut production defects by 15% and raised build quality through release-based validation that verified full compatibility and uptime across deployment cycles.",
+        "Expanded automation coverage by 40% and trimmed manual testing by 50% through end-to-end and system-level test plans across web and API layers."
+      ]
+    },
+    {
+      "role": "Automation Test Engineer (SDET)",
+      "company": "DevQAExpert Solution",
+      "start": "Dec 2023",
+      "end": "Jun 2024",
+      "bullets": [
+        "Slashed test effort by 40% by building Cypress and Mocha setups for cross-browser end-to-end automation.",
+        "Boosted API test reliability by 20% with REST API test suites in RestAssured and Postman that validate responses and API contracts.",
+        "Halved regression cycle times by shipping a reusable data-driven Selenium + TestNG framework in Java."
+      ]
+    },
+    {
+      "role": "Automation Test Engineer (QA)",
+      "company": "Eminence Square",
+      "start": "Apr 2023",
+      "end": "Nov 2023",
+      "bullets": [
+        "Shortened automation onboarding time and improved maintainability with a modular hybrid framework (Java + TestNG + Maven) built from reusable components.",
+        "Fostered stronger collaboration among QA engineers, developers, and business stakeholders by implementing BDD automation with Cucumber and Gherkin."
+      ]
+    },
+    {
+      "role": "QA Engineer",
+      "company": "Vakratund Associate",
+      "start": "Apr 2022",
+      "end": "Aug 2022",
+      "bullets": [
+        "Reached 40% automation coverage of regression test cases with Selenium and Java, enabling faster, repeatable release validation.",
+        "Lowered post-release defects by 10% through thorough functional, UI, and regression testing."
+      ]
+    }
+  ],
+  "education": [
+    {
+      "institution": "Bhopal School of Social Science",
+      "degree": "BBA"
+    }
+  ],
+  "certifications": [],
+  "projects": [
+    {
+      "name": "Huma - AI-Powered HR SaaS Platform | Test Automation (SaaS)",
+      "meta": "Playwright, pytest, FastAPI, React, REST API, Groq AI",
+      "bullets": [
+        "Built end-to-end Playwright workflow coverage for a FastAPI + React HR SaaS platform, spanning 14+ modules (recruitment, payroll, attendance, AI agent, candidate scoring) and 100+ REST API endpoints.",
+        "Designed and ran a 320+ test suite (unit, integration, E2E, functional, security, load) using pytest and Playwright, validating authentication, role-based access, API contracts, and business workflows.",
+        "Performed API load and performance testing, measuring ~45ms p50, ~120ms p95, and ~350ms p99 response times with ~200 req/s throughput, and documented bottlenecks with remediation (file locking, unbounded chat history).",
+        "Authored test, bug, security, and performance reports; validated JWT + bcrypt auth and RBAC across admin, manager, and junior roles."
+      ]
+    },
+    {
+      "name": "HIPAA - Healthcare API Security Validation Platform (Healthcare)",
+      "meta": "Python, OpenAPI/Swagger, HIPAA, FHIR, XSS/SQLi/JWT, OWASP ZAP, Playwright, Docker",
+      "bullets": [
+        "Developed a healthcare API security validation platform that parses OpenAPI specs, maps findings to 12 HIPAA CFR rules across 17 risk types, and detects PHI exposure plus invalid FHIR and ICD-10 data.",
+        "Engineered eight security engines - XSS payload injection, SQL injection via sqlmap, JWT and jwt_tool checks, OWASP ZAP passive/active scanning, RBAC privilege-escalation, and CSRF validation.",
+        "Maintained 83 unit tests and 62 Playwright workflow tests; delivered JSON/HTML HIPAA compliance reports and containerized the scanner with Docker."
+      ]
+    },
+    {
+      "name": "Self-Healing AI Test Automation Framework (GenAI)",
+      "meta": "Playwright, Groq/OpenAI LLMs, LangChain, GitHub Actions, Node.js",
+      "bullets": [
+        "Designed an AI-driven Playwright automation framework that auto-generates test scenarios and heals broken locators at runtime using Groq/OpenAI LLMs and LangChain.",
+        "Implemented a snapshot-based regression agent and selector-healing agent with an orchestrator for self-healing reruns across frontend, UI, responsive, and grammar test suites.",
+        "Integrated tests into a GitHub Actions CI workflow that provisions Playwright browsers, runs suites on push/PR, and uploads HTML reports as build artifacts."
+      ]
+    }
+  ]
+}

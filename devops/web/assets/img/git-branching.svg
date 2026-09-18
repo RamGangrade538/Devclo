@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 408" width="100%" style="background:#fbfbfc;border:1px solid #e6e8ef;border-radius:12px;font-family:'Inter','Segoe UI',system-ui,sans-serif" role="img" aria-label="Git Branching Model (GitFlow)">
+<rect width="860" height="408" fill="#fbfbfc"/>
+<text x="30" y="26" font-size="19" font-weight="800" fill="#0f172a">Git Branching Model (GitFlow)</text>
+<text x="30" y="46" font-size="12.5" fill="#64748b">main + develop + feature + release/hotfix</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<line x1="430" y1="128" x2="430" y2="176" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<line x1="430" y1="242" x2="430" y2="290" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="158" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="430" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="702" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="158" y1="242" x2="50" y2="290" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="430" y1="242" x2="50" y2="290" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="702" y1="242" x2="50" y2="290" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="30" y="62" width="800" height="66" rx="11" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.6"/>
+<text x="430" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">main</text>
+<text x="430" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">production-ready</text>
+<rect x="30" y="176" width="256" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="158" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">develop</text>
+<text x="158" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">integration branch</text>
+<rect x="302" y="176" width="256" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="430" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">release/*</text>
+<text x="430" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">version prep</text>
+<rect x="574" y="176" width="256" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="702" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">hotfix/*</text>
+<text x="702" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">urgent prod fix</text>
+<rect x="30" y="290" width="800" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="430" y="320" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">feature/*</text>
+<text x="430" y="340" text-anchor="middle" font-size="10.5" fill="#64748b">per feature, PR se merge</text>
+<text x="30" y="388" font-size="11.5" fill="#64748b">Commit messages + PR review isse zyada matter karte hain. Trunk-based bhi popular hai.</text>
+</svg>

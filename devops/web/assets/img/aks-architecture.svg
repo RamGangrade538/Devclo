@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 264" width="100%" style="background:#fbfbfc;border:1px solid #e6e8ef;border-radius:12px;font-family:'Inter','Segoe UI',system-ui,sans-serif" role="img" aria-label="AKS Architecture">
+<rect width="860" height="264" fill="#fbfbfc"/>
+<text x="30" y="26" font-size="19" font-weight="800" fill="#0f172a">AKS Architecture</text>
+<text x="30" y="46" font-size="12.5" fill="#64748b">Azure-managed control plane + saath me node pools</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<line x1="430" y1="128" x2="430" y2="176" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="158" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="430" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<line x1="430" y1="128" x2="702" y2="176" stroke="#94a3b8" stroke-width="1.6" marker-end="url(#ah)"/>
+<rect x="30" y="62" width="800" height="66" rx="11" fill="#fef3c7" stroke="#f59e0b" stroke-width="1.6"/>
+<text x="430" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Control Plane (managed)</text>
+<text x="430" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">API server • etcd • scheduler • controllers</text>
+<rect x="30" y="176" width="256" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="158" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Node Pool</text>
+<text x="158" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">VM nodes: kubelet + kube-proxy</text>
+<rect x="302" y="176" width="256" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="430" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">App Pods</text>
+<text x="430" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">replicas (deployments)</text>
+<rect x="574" y="176" width="256" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="702" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">Ingress Controller</text>
+<text x="702" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">nginx — external traffic + TLS</text>
+</svg>

@@ -1,0 +1,19 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 166" width="100%" style="background:#fbfbfc;border:1px solid #e6e8ef;border-radius:12px;font-family:'Inter','Segoe UI',system-ui,sans-serif" role="img" aria-label="Maven Lifecycle Phases">
+<rect width="860" height="166" fill="#fbfbfc"/>
+<text x="30" y="26" font-size="19" font-weight="800" fill="#0f172a">Maven Lifecycle Phases</text>
+<text x="30" y="46" font-size="12.5" fill="#64748b">Har phase pehle wale ke baad chalta hai (order fix)</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<rect x="30" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="90" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">validate</text>
+<rect x="166" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="226" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">compile</text>
+<rect x="302" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="362" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">test</text>
+<rect x="438" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="498" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">package</text>
+<rect x="574" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="634" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">install</text>
+<rect x="710" y="62" width="120" height="52" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="770" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">deploy</text>
+<text x="30" y="146" font-size="11.5" fill="#64748b">mvn clean install = clean + whole chain. pom.xml holi: coordinates (groupId/artifactId/version) + plugins + deps.</text>
+</svg>

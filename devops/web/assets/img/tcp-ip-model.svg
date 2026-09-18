@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 860 522" width="100%" style="background:#fbfbfc;border:1px solid #e6e8ef;border-radius:12px;font-family:'Inter','Segoe UI',system-ui,sans-serif" role="img" aria-label="TCP/IP — 4-Layer Model">
+<rect width="860" height="522" fill="#fbfbfc"/>
+<text x="30" y="26" font-size="19" font-weight="800" fill="#0f172a">TCP/IP — 4-Layer Model</text>
+<text x="30" y="46" font-size="12.5" fill="#64748b">Data sender se receiver tak in layers me chalta hai</text>
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#94a3b8"/></marker></defs>
+<line x1="430" y1="128" x2="430" y2="176" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<line x1="430" y1="242" x2="430" y2="290" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<line x1="430" y1="356" x2="430" y2="404" stroke="#94a3b8" stroke-width="1.8" marker-end="url(#ah)"/>
+<rect x="30" y="62" width="800" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="430" y="92" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">4. Application</text>
+<text x="430" y="112" text-anchor="middle" font-size="10.5" fill="#64748b">HTTP/HTTPS • DNS • SSH • SMTP</text>
+<rect x="30" y="176" width="800" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="430" y="206" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">3. Transport</text>
+<text x="430" y="226" text-anchor="middle" font-size="10.5" fill="#64748b">TCP (reliable) • UDP (fast)</text>
+<rect x="30" y="290" width="800" height="66" rx="11" fill="#eef2ff" stroke="#6366f1" stroke-width="1.6"/>
+<text x="430" y="320" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">2. Internet (IP)</text>
+<text x="430" y="340" text-anchor="middle" font-size="10.5" fill="#64748b">IPv4 • IPv6 • ICMP — routing</text>
+<rect x="30" y="404" width="800" height="66" rx="11" fill="#ecfdf5" stroke="#10b981" stroke-width="1.6"/>
+<text x="430" y="434" text-anchor="middle" font-size="13.5" font-weight="700" fill="#1e293b">1. Link</text>
+<text x="430" y="454" text-anchor="middle" font-size="10.5" fill="#64748b">Ethernet • Wi-Fi • MAC</text>
+<text x="30" y="502" font-size="11.5" fill="#64748b">Interview: encapsulation top→down sender pe, decapsulation receiver pe; port = transport, IP = network.</text>
+</svg>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DevClo — DevOps 50-Day Roadmap (Azure)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/vendor/highlight-github.css">
+<link rel="stylesheet" href="assets/style.css?v=4">
+</head>
+<body>
+<nav class="topbar">
+  <div class="brand" id="brandBtn" title="Home">
+    <span class="logo-mark">⬢</span> DevClo
+    <span class="brand-sub">DevOps 50-Day Roadmap</span>
+  </div>
+
+  <div class="quick-actions">
+    <div class="topsearch" id="topSearch">
+      <div class="topsearch-row">
+        <span class="topsearch-icon">🔎</span>
+        <input type="text" id="topSearchInput" placeholder="Topic search… (subnet, docker, k8s, Day 12)" autocomplete="off" aria-label="Topic search">
+      </div>
+      <div class="topsearch-drop" id="topSearchDrop" hidden></div>
+    </div>
+    <button class="q-btn" id="homeBtn" title="Home">🏠</button>
+    <button class="q-btn" id="paletteBtn" title="Quick Search (Ctrl+K)">🔎 <kbd>Ctrl K</kbd></button>
+    <button class="q-btn chat-toggle" id="chatToggleBtn" title="Chat bot">💬</button>
+  </div>
+
+  <div class="progress-wrap" title="Aapka progress">
+    <div class="progress-bar" id="progressBar"><span id="progressText">0/50 (0%)</span></div>
+  </div>
+</nav>
+
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="side-search">
+      <input type="text" id="sideSearch" placeholder="Search day ya topic… (/)">
+    </div>
+    <div class="side-head">
+      <button class="reset-btn" id="resetBtn" title="Progress reset karo">↺ Reset</button>
+    </div>
+    <div class="group" id="navGroups"></div>
+    <div class="side-foot">
+      <button class="help-btn" id="helpBtn">💡 Help & Debug</button>
+      <button class="help-btn" id="interviewBtn">🎯 Interview Q&A</button>
+    </div>
+  </aside>
+
+  <main class="content" id="content">
+    <div class="loading">Loading…</div>
+  </main>
+</div>
+
+<footer class="footnav" id="footnav" hidden>
+  <button class="nav-btn" id="prevBtn">← Prev</button>
+  <button class="nav-btn mark-done-btn" id="markDoneBtn">✓ Mark Day Complete</button>
+  <button class="nav-btn" id="nextBtn">Next →</button>
+</footer>
+
+<!-- Quick Launch Palette -->
+<div class="palette-overlay" id="paletteOverlay" hidden>
+  <div class="palette">
+    <div class="palette-input-row">
+      <span class="palette-icon">🔎</span>
+      <input type="text" id="paletteInput" placeholder="Kya karna hai? e.g. 'docker', 'Day 5', 'progress', 'chat'…" autocomplete="off">
+      <span class="palette-esc">esc</span>
+    </div>
+    <div class="palette-results" id="paletteResults"></div>
+  </div>
+</div>
+
+<!-- Chat Bot -->
+<div class="chat-fab" id="chatFab" title="DevClo Assistant">🤖</div>
+<div class="chat-panel" id="chatPanel" hidden>
+  <div class="chat-head">
+    <div class="chat-head-title">
+      <span class="chat-avatar">🤖</span>
+      <div>
+        <strong>DevClo Assistant</strong>
+        <span class="chat-status">● online · offline bot</span>
+      </div>
+    </div>
+    <button class="chat-close" id="chatClose">✕</button>
+  </div>
+  <div class="chat-messages" id="chatMessages"></div>
+  <div class="chat-chips" id="chatChips"></div>
+  <div class="chat-input-row">
+    <input type="text" id="chatInput" placeholder="Message… ('help' ya 'day 5')" autocomplete="off">
+    <button class="chat-send" id="chatSend">➤</button>
+  </div>
+</div>
+
+<script src="assets/vendor/marked.min.js"></script>
+<script src="assets/vendor/mermaid.min.js"></script>
+<script src="assets/vendor/highlight.min.js"></script>
+<script src="assets/content.js?v=4"></script>
+<script src="assets/interviews.js?v=4"></script>
+<script src="assets/lab.js?v=4"></script>
+<script src="assets/app.js?v=4"></script>
+<script src="assets/chatbot.js?v=4"></script>
+</body>
+</html>
