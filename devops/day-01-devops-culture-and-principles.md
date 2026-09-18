@@ -250,4 +250,3 @@ echo "DevOps = ye loop chalte rehta hai, kabhi rukta nahi!"
 
 ---
 
-**Kal:** Linux fundamentals - wahi OS jo saare servers par chalta hai. (Linux ke commands se hi DevOps ki asli power shuru hoti hai.)
