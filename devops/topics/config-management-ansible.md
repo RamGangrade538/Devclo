@@ -1,6 +1,6 @@
 # Deep Dive: Ansible — Configuration Management (IaC Ka Doosra Haath)
 
-> **Kaha ka hai:** Day 22 (Terraform) + Day 13 (scripting) ka counter-part. **Terraform = infra banao**, **Ansible = bane hue servers pe software install/configure/tune karo**. Production me dono sath chalti hain. Ye gap hai to 'full DevOps' nahi.
+> **Standalone deep dive:** **Terraform = infra banao**, **Ansible = bane hue servers pe software install/configure/tune karo**. Production me dono sath chalti hain. Ye gap hai to 'full DevOps' nahi.
 
 ---
 

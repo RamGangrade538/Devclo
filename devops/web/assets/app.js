@@ -2,7 +2,6 @@
 
 const DAYS = [
   { num: 0,  week: -1, file: "day-00-setup-and-prerequisites.md",                  title: "Setup & Prerequisites", short: "Tools install, debug, verify", type: "setup" },
-  { num: 1,  week: 1, file: "day-01-devops-culture-and-principles.md",             title: "DevOps Culture & Principles", short: "DevOps, CALMS, CI/CD", type: "concept" },
   { num: 2,  week: 1, file: "day-02-linux-filesystem-and-commands.md",             title: "Linux Filesystem & Commands", short: "ls, cd, find, mkdir, tail", type: "lab" },
   { num: 3,  week: 1, file: "day-03-linux-users-permissions-processes.md",         title: "Users, Permissions & Processes", short: "chmod, chown, ps, kill", type: "lab" },
   { num: 4,  week: 1, file: "day-04-shell-scripting-basics.md",                    title: "Shell Scripting Basics", short: "Variables, if/else, loops", type: "lab" },
@@ -75,12 +74,12 @@ const WEEKS = [
 ];
 
 const TOPICS = [
-  { slug: "devops-culture",        title: "DevOps Culture Deep Dive",     tag: "Day 1 · Culture",        file: "topics/devops-culture.md",        days: [1] },
+  { slug: "devops-culture",        title: "DevOps Culture Deep Dive",     tag: "DevOps Culture",         file: "topics/devops-culture.md",        days: [] },
   { slug: "cicd-explained",        title: "CI/CD vs CD Explained",        tag: "CI/CD",                   file: "topics/cicd-explained.md",        days: [8, 9, 10, 14] },
-  { slug: "containers-vs-vms",     title: "Containers vs VMs",            tag: "Containers",              file: "topics/containers-vs-vms.md",     days: [15] },
-  { slug: "kubernetes-architecture", title: "K8s Control Plane & Scheduling", tag: "Kubernetes", file: "topics/kubernetes-architecture.md", days: [18, 19] },
-  { slug: "dns-explained",         title: "DNS Kaise Kaam Karta Hai",     tag: "Networking",              file: "topics/dns-explained.md",         days: [5] },
-  { slug: "linux-permissions",     title: "Linux Permissions (rwx)",      tag: "Linux",                   file: "topics/linux-permissions.md",     days: [3] },
+  { slug: "containers-vs-vms",     title: "Containers vs VMs",            tag: "Containers",              file: "topics/containers-vs-vms.md",     days: [15], desc: "Docker, images, layers, registries, isolation" },
+  { slug: "kubernetes-architecture", title: "K8s Control Plane & Scheduling", tag: "Kubernetes", file: "topics/kubernetes-architecture.md", desc: "Control plane, scheduling, pods, services", days: [18, 19] },
+  { slug: "dns-explained",         title: "DNS Kaise Kaam Karta Hai",     tag: "Networking",              file: "topics/dns-explained.md",         days: [5], desc: "DNS resolution, records, dig, troubleshooting" },
+  { slug: "linux-permissions",     title: "Linux Permissions (rwx)",      tag: "Linux",                   file: "topics/linux-permissions.md",     days: [3], desc: "rwx, users, groups, sticky bit, sudo" },
   { slug: "what-is-iac",           title: "IaC & Terraform Deep Dive",    tag: "Azure · IaC",             file: "topics/what-is-iac.md",           days: [22, 23] },
   { slug: "observability",         title: "Observability & SRE (SLI/SLO)",tag: "Monitoring · SRE",       file: "topics/observability.md",         days: [24, 25, 27] },
   { slug: "azure-vnet",            title: "Azure Networking (VNet/NSG)",  tag: "Azure",                   file: "topics/azure-vnet.md",            days: [23] },
@@ -103,13 +102,14 @@ const TOPICS = [
   { slug: "supply-chain-security", title: "Supply Chain Security",         tag: "Security",                file: "topics/supply-chain-security.md", days: [48] },
   { slug: "cloud-network-security", title: "Cloud & Network Security",     tag: "Security · Azure",        file: "topics/cloud-network-security.md", days: [49] },
   { slug: "helm-charts",           title: "Helm — K8s Package Manager",   tag: "Kubernetes",              file: "topics/helm-charts.md",           days: [32, 36] },
-  { slug: "linux-systemd-service-management", title: "systemd & Service Management", tag: "Linux", file: "topics/linux-systemd-service-management.md", days: [3, 7, 13] },
-  { slug: "linux-storage-sysadmin", title: "Linux Storage & Sysadmin",     tag: "Linux",                   file: "topics/linux-storage-sysadmin.md", days: [2, 13, 47] },
-  { slug: "git-advanced-workflow", title: "Git Advanced Workflow",         tag: "Git",                     file: "topics/git-advanced-workflow.md",  days: [6, 9] },
-  { slug: "http-rest-api-fundamentals", title: "HTTP & REST API Basics",   tag: "Networking · APIs",       file: "topics/http-rest-api-fundamentals.md", days: [5, 46] },
-  { slug: "load-balancing-reverse-proxy", title: "Load Balancing & Reverse Proxy", tag: "Networking",     file: "topics/load-balancing-reverse-proxy.md", days: [5, 16, 21, 46] },
+  { slug: "linux-systemd-service-management", title: "systemd & Service Management", tag: "Linux", file: "topics/linux-systemd-service-management.md", desc: "systemd units, services, timers, journalctl", days: [3, 7, 13] },
+  { slug: "linux-storage-sysadmin", title: "Linux Storage & Sysadmin",     tag: "Linux",                   file: "topics/linux-storage-sysadmin.md", days: [2, 13, 47], desc: "Disks, LVM, RAID, filesystems, inodes" },
+  { slug: "git-advanced-workflow", title: "Git Advanced Workflow",         tag: "Git",                     file: "topics/git-advanced-workflow.md",  days: [6, 9], desc: "Branching, rebase, reflog, team workflows" },
+  { slug: "github-actions-deep", title: "GitHub — Actions & Collaboration Hub", tag: "Git · CI/CD",           file: "topics/github-actions-deep.md",  days: [], desc: "Repos, PRs, Issues, Actions, Packages, Security" },
+  { slug: "http-rest-api-fundamentals", title: "HTTP & REST API Basics",   tag: "Networking · APIs",       file: "topics/http-rest-api-fundamentals.md", days: [5, 46], desc: "Verbs, status codes, REST design, idempotency" },
+  { slug: "load-balancing-reverse-proxy", title: "Load Balancing & Reverse Proxy", tag: "Networking",     file: "topics/load-balancing-reverse-proxy.md", days: [5, 16, 21, 46], desc: "Nginx, LB algorithms, health checks, TLS termination" },
   { slug: "tls-certificates-pki",  title: "TLS, Certificates & PKI",       tag: "Networking · Security",   file: "topics/tls-certificates-pki.md",   days: [5, 26, 49] },
-  { slug: "nginx-web-server",      title: "Nginx — Web Server & Proxy",    tag: "Web · Infra",             file: "topics/nginx-web-server.md",       days: [5, 7, 13, 16, 21] },
+  { slug: "nginx-web-server",      title: "Nginx — Web Server & Proxy",    tag: "Web · Infra",             file: "topics/nginx-web-server.md",       days: [5, 7, 13, 16, 21], desc: "Config, virtual hosts, proxy, rate limit" },
   { slug: "config-management-ansible", title: "Ansible — Config Management", tag: "Automation · IaC",      file: "topics/config-management-ansible.md", days: [13, 22, 23] },
   { slug: "deployment-strategies", title: "Deployment Strategies",         tag: "CI/CD",                   file: "topics/deployment-strategies.md",  days: [8, 19, 32, 33] },
   { slug: "testing-and-test-automation", title: "Testing & Test Automation", tag: "Quality · CI/CD",      file: "topics/testing-and-test-automation.md", days: [8, 9, 45] },
@@ -120,7 +120,7 @@ const TOPICS = [
 const TOPIC_GROUPS = [
   { name: "🧱 DevOps Basics",         slugs: ["devops-culture", "cicd-explained", "what-is-iac"] },
   { name: "🐧 Linux & Shell",         slugs: ["linux-permissions", "linux-storage-sysadmin", "linux-systemd-service-management", "python-automation-scripts"] },
-  { name: "⚙️ Git & CI/CD",           slugs: ["git-advanced-workflow", "deployment-strategies", "testing-and-test-automation"] },
+  { name: "⚙️ Git & CI/CD",           slugs: ["git-advanced-workflow", "github-actions-deep", "deployment-strategies", "testing-and-test-automation"] },
   { name: "🔗 Networking & Web",      slugs: ["dns-explained", "http-rest-api-fundamentals", "load-balancing-reverse-proxy", "tls-certificates-pki", "nginx-web-server"] },
   { name: "🐳 Containers & Docker",   slugs: ["containers-vs-vms", "kubernetes-architecture", "helm-charts"] },
   { name: "☁️ Cloud & IaC",           slugs: ["azure-vnet", "config-management-ansible"] },
@@ -128,6 +128,63 @@ const TOPIC_GROUPS = [
   { name: "🔐 Security & DevSecOps",  slugs: ["devsecops", "secret-management", "policy-as-code", "supply-chain-security", "cloud-network-security"] },
   { name: "🛠️ Platform & GitOps",     slugs: ["platform-engineering-idp", "gitops-argocd", "service-mesh-explained", "finops-cloud-cost"] },
   { name: "🚀 Advanced Topics",       slugs: ["chaos-engineering", "disaster-recovery-backup", "multicloud-patterns", "serverless-event-driven", "mlops-basics", "dataops-pipelines", "api-gateways", "microservices-patterns", "performance-engineering"] },
+];
+
+/* ---------- DevOps Topics Dashboard — 50-day course se ALAG topic library ----------
+   Content: devops/modules/*.md (build_site.py bundle karta hai).
+   Progress: devclo-modules-progress me alag — 50-day keys (devclo-day-*, devclo-progress,
+   devclo-exp-progress) ko kabhi chhuta nahi. current = -10 dashboard, -11 module page. */
+const MODULE_PROGRESS_KEY = "devclo-modules-progress";
+const TOPIC_LEVELS = [
+  { key: 1, name: "Foundation",        icon: "🧱", note: "basics jo har DevOps ko aane chahiye" },
+  { key: 2, name: "DevOps Core",       icon: "⚙️", note: "roj ka DevOps kaam" },
+  { key: 3, name: "Cloud Native",      icon: "☸️", note: "containers + cloud platforms" },
+  { key: 4, name: "Production Engineering", icon: "🚀", note: "systems ko run + operate karo" },
+  { key: 5, name: "Security",          icon: "🛡️", note: "DevSecOps + hardening" },
+  { key: 6, name: "Platform Engineering", icon: "🛠️", note: "design, scale, aur platform" },
+  { key: 7, name: "AIOps & Automation", icon: "🤖", note: "AI + automation aage" },
+];
+const TOPIC_MODULES = [
+  { slug: "devops-fundamentals",        title: "DevOps Fundamentals",           emoji: "🧱", level: 1, tagline: "Culture, lifecycle, CI/CD foundation" },
+  { slug: "linux",                      title: "Linux",                         emoji: "🐧", level: 1, tagline: "Commands, permissions, systemd, logs" },
+  { slug: "networking",                 title: "Networking",                    emoji: "🌐", level: 1, tagline: "DNS, HTTP, TCP/IP, firewalls" },
+  { slug: "git-version-control",        title: "Git & Version Control",         emoji: "🔀", level: 1, tagline: "Branch, merge, rebase, team workflows" },
+  { slug: "programming-scripting",      title: "Bash / Python / Go",            emoji: "🐍", level: 1, tagline: "Scripting for automation" },
+  { slug: "yaml-json",                  title: "YAML & JSON",                   emoji: "📄", level: 1, tagline: "Config formats + validation" },
+  { slug: "cloud-fundamentals",         title: "Cloud Fundamentals",            emoji: "☁️", level: 2, tagline: "IaaS/PaaS/SaaS, regions, core services" },
+  { slug: "cicd",                       title: "CI/CD",                         emoji: "⚙️", level: 2, tagline: "GitHub Actions, Jenkins, Argo pipelines" },
+  { slug: "artifact-package-management", title: "Artifact & Package Management", emoji: "📦", level: 2, tagline: "Registries, versions, promotion" },
+  { slug: "docker-containers",          title: "Docker & Containers",           emoji: "🐳", level: 2, tagline: "Images, compose, registries" },
+  { slug: "iac",                        title: "Infrastructure as Code",        emoji: "🏗️", level: 2, tagline: "Terraform, Bicep, CloudFormation" },
+  { slug: "config-management",          title: "Ansible & Config Management",   emoji: "🤖", level: 2, tagline: "Desired state, roles, idempotency" },
+  { slug: "deployment-strategies",      title: "Deployment Strategies",         emoji: "🚀", level: 2, tagline: "Blue/green, canary, rolling" },
+  { slug: "kubernetes",                 title: "Kubernetes",                    emoji: "☸️", level: 3, tagline: "Cluster, pods, services, Helm" },
+  { slug: "storage",                    title: "Storage",                       emoji: "💾", level: 3, tagline: "Block/file/object + PV/PVC" },
+  { slug: "gitops",                     title: "GitOps",                        emoji: "🔁", level: 3, tagline: "Argo CD, Flux, drift, self-heal" },
+  { slug: "iam",                        title: "IAM",                           emoji: "🪪", level: 3, tagline: "Users, roles, policies, SSO" },
+  { slug: "service-mesh",               title: "Service Mesh",                  emoji: "🪢", level: 3, tagline: "mTLS, traffic split, Istio/Linkerd" },
+  { slug: "databases",                  title: "Databases",                     emoji: "🗄️", level: 4, tagline: "SQL/NoSQL, HA, migrations, DataOps" },
+  { slug: "messaging-events",           title: "Messaging & Event Systems",     emoji: "📨", level: 4, tagline: "Kafka, queues, pub/sub, streams" },
+  { slug: "observability",              title: "Observability",                 emoji: "📡", level: 4, tagline: "Metrics, logs, traces — 3 pillars" },
+  { slug: "monitoring",                 title: "Monitoring",                    emoji: "📈", level: 4, tagline: "Prometheus, Grafana, alerting" },
+  { slug: "sre",                        title: "SRE",                           emoji: "🛰️", level: 4, tagline: "SLI/SLO, error budget, toil" },
+  { slug: "incident-management",        title: "Incident Management",           emoji: "🚒", level: 4, tagline: "On-call, postmortem, MTTR" },
+  { slug: "performance-engineering",    title: "Performance Engineering",       emoji: "🏎️", level: 4, tagline: "Load tests, caching, p99 latency" },
+  { slug: "reliability-resilience",     title: "Reliability & Resilience",      emoji: "💪", level: 4, tagline: "HA, chaos, DR, RTO/RPO" },
+  { slug: "security-fundamentals",      title: "Security Fundamentals",         emoji: "🔐", level: 5, tagline: "CIA, IAM, TLS, vuln management" },
+  { slug: "devsecops",                  title: "DevSecOps",                     emoji: "🛡️", level: 5, tagline: "SAST/SCA, scans, policy gates" },
+  { slug: "secrets-management",         title: "Secrets Management",            emoji: "🗝️", level: 5, tagline: "Vault, rotation, dynamic creds" },
+  { slug: "supply-chain-security",      title: "Software Supply Chain Security", emoji: "📜", level: 5, tagline: "SBOM, SLSA, signing, provenance" },
+  { slug: "service-architecture",       title: "Service Architecture",          emoji: "🧩", level: 6, tagline: "Monolith vs micro, APIs, gateways" },
+  { slug: "distributed-systems",        title: "Distributed Systems",           emoji: "🕸️", level: 6, tagline: "CAP, consensus, replication" },
+  { slug: "platform-engineering",       title: "Platform Engineering",          emoji: "🛠️", level: 6, tagline: "IDP, Backstage, golden paths" },
+  { slug: "advanced-cloud",             title: "Advanced Cloud",                emoji: "🌩️", level: 6, tagline: "Serverless, edge, multi-cloud" },
+  { slug: "architecture",               title: "DevOps Architecture",           emoji: "🏛️", level: 6, tagline: "HA, event-driven, evolution patterns" },
+  { slug: "finops-cost",                title: "FinOps / Cloud Cost",           emoji: "💰", level: 6, tagline: "Budgets, right-sizing, savings" },
+  { slug: "must-know-tools",            title: "Must-Know Tools",               emoji: "🧰", level: 6, tagline: "Git, Docker, K8s, Terraform, Grafana" },
+  { slug: "aiops",                      title: "AIOps & LLMOps",                emoji: "🤖", level: 7, tagline: "ML ops + LLM/RAG in production" },
+  { slug: "automation",                 title: "Automation",                    emoji: "⚡", level: 7, tagline: "Cron, workflows, self-healing" },
+  { slug: "troubleshooting",            title: "Troubleshooting",               emoji: "🩺", level: 7, tagline: "Logs, hypothesis, root cause" },
 ];
 
 /* ---------- Detailed Track (Master Plan, Day 1-40) ----------
@@ -275,6 +332,47 @@ function saveTaskState(n, arr) {
   if (arr.length > 0 && isAllChecked(n)) markDay(n, true);
   else if (arr.length === 0 && !hasAnyCheck(n) && isDone(n)) markDay(n, false);
 }
+
+/* Module (DevOps Topics) progress — sirf apne key me, 50-day se independent */
+function getModulesProgress() {
+  try { return JSON.parse(localStorage.getItem(MODULE_PROGRESS_KEY) || "{}"); }
+  catch (e) { return {}; }
+}
+function saveModulesProgress(obj) { localStorage.setItem(MODULE_PROGRESS_KEY, JSON.stringify(obj)); }
+function getModuleTaskState(slug) {
+  const all = getModulesProgress();
+  return Array.isArray(all[slug]) ? all[slug] : [];
+}
+function saveModuleTaskState(slug, state) {
+  const all = getModulesProgress();
+  all[slug] = state;
+  saveModulesProgress(all);
+}
+function moduleTotal(slug) {
+  const md = getContent("modules/" + slug + ".md") || "";
+  return (md.match(/^[ \t]*- \[ \]/gm) || []).length;
+}
+function moduleDone(slug) { return Math.min(getModuleTaskState(slug).length, moduleTotal(slug)); }
+function modulePct(slug) {
+  const t = moduleTotal(slug);
+  return t ? Math.round(moduleDone(slug) / t * 100) : 0;
+}
+function levelPct(levelKey) {
+  const mods = TOPIC_MODULES.filter(m => m.level === levelKey);
+  let total = 0, done = 0;
+  mods.forEach(m => { total += moduleTotal(m.slug); done += moduleDone(m.slug); });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0, count: mods.length };
+}
+function modulesOverall() {
+  let total = 0, done = 0, started = 0, finished = 0;
+  TOPIC_MODULES.forEach(m => {
+    total += moduleTotal(m.slug);
+    done += moduleDone(m.slug);
+    if (moduleDone(m.slug) > 0) started++;
+    if (moduleTotal(m.slug) > 0 && modulePct(m.slug) >= 100) finished++;
+  });
+  return { total, done, pct: total ? Math.round(done / total * 100) : 0, started, finished };
+}
 function nextUndone() {
   const p = getProgress();
   const last = DAYS[DAYS.length - 1].num;
@@ -284,11 +382,12 @@ function nextUndone() {
 function weekOfDay(n) { const d = DAYS.find(x => x.num === n); return d ? d.week : 0; }
 
 /* ---------- Sidebar ---------- */
-let current = -1; // -1 home, -2 help, -3 deep-dive topic, -4 interviews, -5 lab, >=0 day
+let current = -1; // -1 home, -2 help, -3 deep-dive topic, -4 interviews, -5 lab, -6 learn, -7 platform, -10 topics dashboard, -11 topic module, >=0 day
 let topicSlug = null;
 let currentTopicSlug = null;
 let currentSub = null;
 let interviewDay = null;
+let currentModuleSlug = "";
 
 let sbMemOpen = new Set();
 function sbOpenSet() { return sbMemOpen; }
@@ -374,6 +473,11 @@ function renderSidebar() {
 
 function isOTF(slug) { return slug.indexOf("otf-") === 0; }
 
+/* Sidebar visibility: dashboard pe hidden, content/topic pages pe visible. */
+function setSideNav(show) {
+  document.body.classList.toggle("side-nav", !!show);
+}
+
 function updateProgressBar() {
   const total = DAYS[DAYS.length - 1].num;
   const done = getProgress().filter(n => n >= 1 && n <= total).length;
@@ -403,7 +507,8 @@ function renderMarkdown(md) {
     .replace(/<a href="(day-[0-9][0-9]-[^"]+\.md)"/g, '<a href="#$1" data-internal="1"')
     .replace(/<a href="(capstone\/day-[0-9][0-9][^"]+\.md)"/g, '<a href="#$1" data-internal="1"')
     .replace(/<a href="(?:\.\.\/)?expanded\/(day-[0-9][0-9][^"]+\.md)"/g, '<a href="#expanded/$1" data-internal="1"')
-    .replace(/<a href="(topics\/[^"]+\.md)"/g, (m, f) => '<a href="#' + f.replace(/^topics\//, "topic-").replace(/\.md$/, "") + '" data-internal="1"');
+    .replace(/<a href="(topics\/[^"]+\.md)"/g, (m, f) => '<a href="#' + f.replace(/^topics\//, "topic-").replace(/\.md$/, "") + '" data-internal="1"')
+    .replace(/<a href="(?:\.\.\/)?modules\/([^"]+\.md)"/g, (m, f) => '<a href="#module-' + f.replace(/\.md$/, "") + '" data-internal="1"');
 }
 
 function findDayByFile(file) {
@@ -479,6 +584,7 @@ async function afterRender(n) {
       ev.preventDefault();
       const raw = a.getAttribute("href").slice(1);
       if (raw.startsWith("topic-")) return loadTopic(raw.slice(6));
+      if (raw.startsWith("module-")) return loadModule(raw.slice(7));
       if (raw.startsWith("expanded/")) {
         const ed = expByFile(raw);
         if (ed) return loadExpanded(ed.n);
@@ -547,6 +653,7 @@ async function loadDay(n) {
   const d = DAYS.find(x => x.num === n);
   if (!d) return;
   current = n;
+  setSideNav(true);
   window.location.hash = "day-" + n;
   els.footnav.hidden = false;
   els.content.classList.add("markdown-body");
@@ -571,6 +678,7 @@ async function loadExpanded(n) {
   const d = EXP_DAYS.find(x => x.n === n);
   if (!d) return;
   current = vid(n);
+  setSideNav(true);
   window.location.hash = "exp-" + n;
   els.footnav.hidden = false;
   els.content.classList.add("markdown-body");
@@ -593,6 +701,7 @@ async function loadExpanded(n) {
 
 async function loadHelp() {
   current = -2;
+  setSideNav(true);
   window.location.hash = "help";
   els.footnav.hidden = false;
   els.content.classList.add("markdown-body");
@@ -618,6 +727,7 @@ async function loadTopic(slug, subIndex) {
   const t = TOPICS.find(x => x.slug === slug);
   if (!t && !isOTF) return;
   current = -3;
+  setSideNav(true);
   topicSlug = slug;
   currentTopicSlug = slug;
   currentSub = (typeof subIndex === "number" && subIndex >= 0) ? subIndex : null;
@@ -681,6 +791,7 @@ function interviewHTML(fl) {
 }
 function loadInterviews(dayFilter) {
   current = -4;
+  setSideNav(true);
   interviewDay = dayFilter || null;
   window.location.hash = interviewDay ? "interview-" + interviewDay : "interviews";
   els.footnav.hidden = false;
@@ -695,6 +806,7 @@ function loadInterviews(dayFilter) {
 /* ---------- Practice Lab ---------- */
 function loadLab() {
   current = -5;
+  setSideNav(true);
   window.location.hash = "lab";
   els.footnav.hidden = false;
   els.content.classList.remove("markdown-body");
@@ -708,68 +820,271 @@ function loadLab() {
   }
 }
 
-/* ---------- Landing ---------- */
+/* ---------- Landing (Dashboard) ----------
+   Home = two separate parts:
+   1) 🚀 DevOps 50-Day Roadmap  — day-by-day journey (resume, practice, platform, interview)
+   2) 📚 Independent Deep Dives — standalone topics (git/linux/networking/docker/…), NO day relation.
+   Sidebar nahi, sirf header + chat. Local file me offline.
+ */
+const QUICK_TOPICS = [
+  ["Git",        "git-advanced-workflow"],
+  ["GitHub",     "github-actions-deep"],
+  ["Linux",      "linux-permissions"],
+  ["Networking", "dns-explained"],
+  ["Docker",     "containers-vs-vms"],
+  ["Kubernetes", "kubernetes-architecture"],
+  ["Terraform",  "what-is-iac"],
+  ["Azure",      "azure-vnet"],
+  ["ArgoCD",     "gitops-argocd"],
+  ["Istio",      "service-mesh-explained"],
+  ["Kyverno",    "policy-as-code"],
+  ["Vault",      "secret-management"],
+  ["Prometheus", "observability"],
+  ["Grafana",    "observability"],
+  ["dbt",        "dataops-pipelines"],
+  ["KEDA",       "serverless-event-driven"],
+  ["cosign",     "supply-chain-security"],
+];
+
 function loadStart() {
-  const seg = (window.location.hash.match(/^#seg-(learn|practice|platform)$/) || [])[1] || "learn";
   current = -1;
+  setSideNav(false);
   const h0 = window.location.hash;
-  if (h0 === "" || h0 === "#start") window.location.hash = "start";
+  if (h0 === "" || h0 === "#start" || h0.startsWith("#seg-")) window.location.hash = "start";
   els.footnav.hidden = true;
   els.content.classList.remove("markdown-body");
   alwaysShowDoneBtn();
   renderSidebar();
-  els.content.innerHTML = landingHTML();
-  const tg = document.getElementById("topicGrid");
-  if (tg) tg.innerHTML = buildTopicCards();
-  const cg = document.getElementById("conceptGrid");
-  if (cg) cg.innerHTML = buildConceptCards();
-  document.getElementById("weekGrid").innerHTML = buildWeekCards();
-  document.getElementById("dayGrid").innerHTML = buildDayCards();
-  const ecg = document.getElementById("expCoreGrid");
-  if (ecg) ecg.innerHTML = buildExpCoreCards();
-  const epg = document.getElementById("expPlatformGrid");
-  if (epg) epg.innerHTML = buildExpPlatformCards();
-  const ag = document.getElementById("advGrid");
-  if (ag) ag.innerHTML = buildAdvCards();
-  const ptg = document.getElementById("platformTopicGrid");
-  if (ptg) ptg.innerHTML = buildPlatformTopicCards();
-  const todayMd = getContent("today-task.md");
-  const box = document.getElementById("todayBox");
-  if (todayMd !== null && box) box.innerHTML = marked.parse(todayMd, { gfm: true, breaks: true });
-  // accordion switching (Learn / Practice / Platform)
-  els.content.querySelectorAll(".acc-head").forEach(btn => {
-    const toggle = () => {
-      const acc = btn.closest(".acc");
-      const opening = !acc.classList.contains("open");
-      if (opening) activateSeg(btn.dataset.seg, true);
-      else acc.classList.remove("open");
-    };
-    btn.addEventListener("click", toggle);
-    btn.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); toggle(); } });
-  });
-  activateSeg(seg, false);
-  document.querySelectorAll('[data-ql]').forEach(b => {
+  const total = DAYS[DAYS.length - 1].num;
+  const done = getProgress().filter(n => n >= 1 && n <= total).length;
+  const pct = Math.round(done / total * 100);
+  const next = nextUndone();
+  els.content.innerHTML =
+    '<div class="landing">' +
+      '<div class="hero hero-min">' +
+          "<h1>⬢ DevClo — DevOps Roadmap</h1>" +
+          "<p>Simple English + Hindi, har din practical lab ke saath — <strong>Microsoft Azure</strong>, concepts cloud-agnostic. 0 → 5-saal tak ka sapna.</p>" +
+          '<div class="hero-progress"><div class="progress-bar" style="width:' + Math.max(pct, 6) + '%"><span>' + done + "/" + total + " · " + pct + "%</span></div></div>" +
+      "</div>" +
+
+      '<h2 class="dash-sec-title">🚀 DevOps 50-Day Roadmap</h2>' +
+      '<div class="dash-grid">' +
+        dashTile("start", "▶️", "Resume / Start", next ? "Abhi Day " + next + " se shuru karo (incomplete)" : "Saare days complete! 🎉", true) +
+        dashTile("practice", "🧪", "Practice Lab", "Sandbox terminal + labs try karo") +
+        dashTile("platform", "🛠️", "Platform", "Day 31-50: Platform Engineering + Advanced") +
+        dashTile("interview", "🎯", "Interview Q&A", "Day-wise questions + tricky") +
+      "</div>" +
+
+      '<h2 class="dash-sec-title">🗂️ DevOps Topics<span class="sec-note"> (separate topic library — 50-day course se alag)</span></h2>' +
+      '<div class="dash-grid">' +
+        dashTile("topics", "🗂️", "Topics Dashboard", "40 topic modules — Hinglish, Beginner→Advanced, apni alag progress") +
+        (function () {
+          const next = TOPIC_MODULES.find(m => moduleDone(m.slug) > 0 && modulePct(m.slug) < 100) ||
+            TOPIC_MODULES.find(m => modulePct(m.slug) < 100);
+          if (!next) return dashTile("topics", "🎉", "All Modules Complete!", "Topic library 100% — revise karo");
+          return '<button class="dash-tile" data-mod="' + next.slug + '">' +
+            '<span class="dt-emoji">' + next.emoji + "</span>" +
+            '<span class="dt-body"><span class="dt-name">Continue: ' + escText(next.title) + '</span><span class="dt-sub">module · ' + modulePct(next.slug) + "% done</span></span>" +
+            '<span class="dt-go">→</span></button>';
+        })() +
+      "</div>" +
+
+      '<h2 class="dash-sec-title">📚 Independent Deep Dives<span class="sec-note"> (day se alag — standalone topics)</span></h2>' +
+      '<div class="dash-grid dash-topics">' +
+        TOPICS.map(t => '<button class="dash-tile mini" data-topic="' + t.slug + '" title="' + (t.desc || t.tag) + '"><span class="dt-emoji">▸</span><span class="dt-name">' + t.title.replace(/ Deep Dive$| Explained$| Basics$/, "") + "</span></button>").join("") +
+        '<button class="dash-tile mini primary" data-go="learn"><span class="dt-emoji">▶</span><span class="dt-name">View All</span></button>' +
+      "</div>" +
+
+      '<h2 class="dash-sec-title">🧰 Tools</h2>' +
+      '<div class="dash-grid dash-topics">' +
+        dashTile("help", "💡", "Help & Debug", "Problem ? yahan dekho") +
+        dashTile("chat", "💬", "DevClo Chat", "Assistant se poochho") +
+        dashTile("palette", "🔎", "Quick Launch", "Ctrl+K") +
+      "</div>" +
+    "</div>";
+  els.content.querySelectorAll(".dash-tile").forEach(b => {
     b.addEventListener("click", () => {
-      const v = b.getAttribute("data-ql");
-      if (v === "start") loadDay(1);
-      else if (v === "setup") loadDay(0);
-      else if (v === "help") loadHelp();
-      else if (v === "resume") loadDay(nextUndone());
-      else if (v === "chat") toggleChat(true);
-      else if (v === "palette") openPalette();
-      else if (v === "interview") loadInterviews(null);
-      else if (v === "lab") loadLab();
-      else if (v === "golearn") { activateSeg("learn", false); scrollToSeg("learn"); }
-      else if (v === "gopractice") { activateSeg("practice", false); scrollToSeg("practice"); }
-      else if (v === "goplatform") { activateSeg("platform", false); scrollToSeg("platform"); }
-      else if (v === "expstart") { location.hash = "exp-1"; loadExpanded(1); }
+      const go = b.getAttribute("data-go");
+      const topic = b.getAttribute("data-topic");
+      const mod = b.getAttribute("data-mod");
+      if (mod) return loadModule(mod);
+      if (topic) return loadTopic(topic);
+      if (go === "start") loadDay(nextUndone() >= 0 ? nextUndone() : 0);
+      else if (go === "learn") loadLearn();
+      else if (go === "practice") loadLab();
+      else if (go === "platform") loadPlatform();
+      else if (go === "interview") loadInterviews(null);
+      else if (go === "topics") loadTopicsDashboard();
+      else if (go === "help") loadHelp();
+      else if (go === "chat") toggleChat(true);
+      else if (go === "palette") openPalette();
     });
   });
+  updateProgressBar();
+}
+
+function dashTile(go, icon, title, sub) {
+  return '<button class="dash-tile" data-go="' + go + '">' +
+    '<span class="dt-emoji">' + icon + "</span>" +
+    '<span class="dt-body"><span class="dt-name">' + title + "</span><span class=\"dt-sub\">" + sub + "</span></span>" +
+    '<span class="dt-go">→</span>' +
+  "</button>";
+}
+
+/* ---------- Learn page (saare deep dives) ---------- */
+function loadLearn() {
+  current = -6;
+  setSideNav(false);
+  window.location.hash = "learn";
+  els.footnav.hidden = true;
+  els.content.classList.remove("markdown-body");
+  alwaysShowDoneBtn();
+  renderSidebar();
+  els.content.innerHTML =
+    '<div class="landing">' +
+      "<h1>📚 Independent Deep Dives</h1>" +
+      '<p class="hero-min-tip">Ye topics 50-day roadmap se independent hain — standalone knowledge blocks. Kisi bhi time padho. 👆</p>' +
+      '<div id="topicGrid" class="grid"></div>' +
+    "</div>";
+  document.getElementById("topicGrid").innerHTML = buildTopicCards();
+  updateProgressBar();
+}
+
+/* ---------- Platform page (Platform Eng + Advanced Class) ---------- */
+function loadPlatform() {
+  current = -7;
+  setSideNav(false);
+  window.location.hash = "platform";
+  els.footnav.hidden = true;
+  els.content.classList.remove("markdown-body");
+  alwaysShowDoneBtn();
+  renderSidebar();
+  els.content.innerHTML =
+    '<div class="landing">' +
+      "<h1>🛠️ Platform — Engineering Track + Advanced Class</h1>" +
+      "<h2>🛠️ Platform Engineering Track (Detailed Day 31-40)</h2>" +
+      '<div id="expPlatformGrid" class="grid"></div>' +
+      "<h2>📈 Advanced Class (Day 32-50)</h2>" +
+      '<div id="advGrid" class="grid"></div>' +
+      "<h2>🛠️ Platform Deep Dives</h2>" +
+      '<div id="platformTopicGrid" class="grid"></div>' +
+    "</div>";
+  document.getElementById("expPlatformGrid").innerHTML = buildExpPlatformCards();
+  document.getElementById("advGrid").innerHTML = buildAdvCards();
+  document.getElementById("platformTopicGrid").innerHTML = buildPlatformTopicCards();
+  updateProgressBar();
 }
 
 function scrollToSeg(seg) {
   const acc = els.content.querySelector("#acc-" + seg);
   if (acc) acc.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
+/* ---------- DevOps Topics Dashboard + Module pages (course se independent) ---------- */
+function moduleCardHTML(m) {
+  const pct = modulePct(m.slug), done = moduleDone(m.slug), total = moduleTotal(m.slug);
+  return '<a class="card mod-card' + (total > 0 && pct >= 100 ? " done" : "") + '" href="#module-' + m.slug + '" onclick="loadModule(\'' + m.slug + "')\">" +
+    '<div><span class="card-num">' + m.emoji + " · L" + m.level + '</span> <span class="card-type">' + done + "/" + total + "</span></div>" +
+    '<div class="card-title">' + escText(m.title) + "</div>" +
+    '<div class="card-sub">' + escText(m.tagline) + " · " + pct + "%</div>" +
+    '<div class="mod-card-bar"><div class="progress-bar" style="width:' + Math.max(pct, 4) + '%"></div></div>' +
+  "</a>";
+}
+function moduleHeadHTML(m) {
+  const pct = modulePct(m.slug), done = moduleDone(m.slug), total = moduleTotal(m.slug);
+  const lv = TOPIC_LEVELS.find(l => l.key === m.level) || { name: "" };
+  return '<div class="mod-head" id="modHead">' +
+    '<a class="mod-back" href="#topics">← Topics Dashboard</a>' +
+    '<div class="mod-meta"><span class="mod-lvl">L' + m.level + " · " + escText(lv.name) + '</span><span class="mod-tagline">' + escText(m.tagline) + "</span></div>" +
+    '<div class="mod-progress"><div class="progress-bar" id="modProgressBar" style="width:' + Math.max(pct, 6) + '%"><span id="modProgressText">' + done + "/" + total + " · " + pct + "%</span></div></div>" +
+  "</div>";
+}
+function updateModuleHead() {
+  if (current !== -11) return;
+  const bar = document.getElementById("modProgressBar");
+  const txt = document.getElementById("modProgressText");
+  if (!bar) return;
+  const pct = modulePct(currentModuleSlug), done = moduleDone(currentModuleSlug), total = moduleTotal(currentModuleSlug);
+  bar.style.width = Math.max(pct, 6) + "%";
+  if (txt) txt.textContent = done + "/" + total + " · " + pct + "%";
+}
+function loadTopicsDashboard() {
+  current = -10;
+  currentModuleSlug = "";
+  setSideNav(false);
+  window.location.hash = "topics";
+  els.footnav.hidden = true;
+  els.markDoneBtn.style.display = "none";
+  els.content.classList.remove("markdown-body");
+  renderSidebar();
+  const ov = modulesOverall();
+  const nextMod = TOPIC_MODULES.find(m => moduleDone(m.slug) > 0 && modulePct(m.slug) < 100) ||
+    TOPIC_MODULES.find(m => modulePct(m.slug) < 100);
+  els.content.innerHTML =
+    '<div class="landing topics-dash">' +
+      '<div class="hero hero-min td-hero">' +
+        "<h1>🗂️ DevOps Topics Dashboard</h1>" +
+        "<p>Ye <strong>DevOps in 50 Days</strong> course se ek <strong>alag, independent topic library</strong> hai — " + TOPIC_MODULES.length + " modules, har ek me Hinglish overview, Beginner → Intermediate → Advanced, concept checklists, recommended tools aur practical labs. Yahan ka progress <em>apni alag jagah</em> save hota hai — 50-day course ko chhuta nahi.</p>" +
+        '<div class="hero-progress"><div class="progress-bar" style="width:' + Math.max(ov.pct, 6) + '%"><span>' + ov.done + "/" + ov.total + " concepts · " + ov.pct + "%</span></div></div>" +
+        '<p class="hero-min-tip">📚 ' + TOPIC_MODULES.length + " modules · " + ov.started + " started · " + ov.finished + " complete · koi bhi module kisi bhi order me padho</p>" +
+      "</div>" +
+      '<div class="track-split">' +
+        '<div class="track-box"><b>🚀 DevOps in 50 Days</b><span>Fixed day-wise course — Day 0 → Day 50, weekly challenges, ek fixed order. Ye waisa ka waisa hai.</span><a class="chiphref" href="#start">Course home →</a></div>' +
+        '<div class="track-box active"><b>🗂️ DevOps Topics — aap yahan hain</b><span>Topic-based playlists — koi bhi module kabhi bhi, alag se progress track, 40 independent topics.</span></div>' +
+      "</div>" +
+      '<div class="mod-toolbar">' +
+        '<div class="mod-stats">' +
+          '<span class="chip-stat">🧩 ' + TOPIC_MODULES.length + " modules</span>" +
+          '<span class="chip-stat">📖 ' + ov.total + " checklist items</span>" +
+          '<span class="chip-stat">✅ ' + ov.pct + "% overall</span>" +
+          (nextMod ? '<span class="chip-stat">▶ next: ' + escText(nextMod.title) + "</span>" : "") +
+        "</div>" +
+        '<button class="reset-btn" id="modResetBtn" title="Sirf topic library ka progress reset">↺ Reset topic progress</button>' +
+      "</div>" +
+      TOPIC_LEVELS.map(lv => {
+        const lp = levelPct(lv.key);
+        if (!lp.count) return "";
+        return '<section class="track-sec">' +
+          '<h2 class="dash-sec-title">' + lv.icon + " Level " + lv.key + " — " + escText(lv.name) +
+            '<span class="sec-note"> (' + escText(lv.note) + ") · " + lp.done + "/" + lp.total + " · " + lp.pct + "%</span></h2>" +
+          '<div class="grid mod-grid">' + TOPIC_MODULES.filter(m => m.level === lv.key).map(moduleCardHTML).join("") + "</div>" +
+        "</section>";
+      }).join("") +
+    "</div>";
+  const modResetBtn = document.getElementById("modResetBtn");
+  if (modResetBtn) modResetBtn.addEventListener("click", () => {
+    if (confirm("Sirf DevOps Topics ka progress delete karna hai? (50-day course progress safe rahega)")) {
+      saveModulesProgress({});
+      loadTopicsDashboard();
+    }
+  });
+}
+async function loadModule(slug) {
+  const m = TOPIC_MODULES.find(x => x.slug === slug);
+  if (!m) return loadTopicsDashboard();
+  current = -11;
+  currentModuleSlug = slug;
+  setSideNav(false);
+  window.location.hash = "module-" + slug;
+  els.footnav.hidden = true;
+  els.markDoneBtn.style.display = "none";
+  els.content.classList.add("markdown-body");
+  els.content.innerHTML = '<div class="loading">Loading module…</div>';
+  renderSidebar();
+  try {
+    const md = getContent("modules/" + slug + ".md");
+    if (md === null) throw new Error("Module content nahi mili: " + slug);
+    await pipeInto(md, -11, { hero: m.emoji + " TOPIC MODULE — " + m.title });
+    const state = getModuleTaskState(slug);
+    Array.from(els.content.querySelectorAll("input.task-cb")).forEach((cb, i) => {
+      cb.checked = state.indexOf(i) >= 0;
+    });
+    const h1 = els.content.querySelector("h1");
+    if (h1) h1.insertAdjacentHTML("afterend", moduleHeadHTML(m));
+    updateModuleHead();
+  } catch (err) {
+    els.content.innerHTML = '<div class="notice">❌ ' + err.message + '</div><button class="cta" onclick="App.loadTopicsDashboard()">← Back to Topics Dashboard</button>';
+  }
 }
 
 function activateSeg(seg, setHash) {
@@ -781,102 +1096,6 @@ function activateSeg(seg, setHash) {
 }
 
 function alwaysShowDoneBtn() { els.markDoneBtn.style.display = ""; }
-
-function landingHTML() {
-  const total = DAYS[DAYS.length - 1].num;
-  const done = getProgress().filter(n => n >= 1 && n <= total).length;
-  const expDone = getExpProgress().length;
-  return '<div class="landing">' +
-    '<div class="hero">' +
-      "<h1>⬢ DevOps 50-Day Roadmap</h1>" +
-      "<p>Simple English + Hindi mein, har din practical lab ke saath — hands-on <strong>Microsoft Azure</strong> pe, concepts <strong>cloud-agnostic</strong> (AWS/GCP bhi same). 0 → 5-saal experience level: Learn (concepts) → Practice (labs/capstones) → Platform (advanced + platform engineering).</p>" +
-      '<div class="stat-row">' +
-        '<div class="stat"><b>' + done + '/' + total + '</b><span>DIN COMPLETE</span></div>' +
-        '<div class="stat"><b>' + (done / total * 100).toFixed(0) + '%</b><span>PROGRESS</span></div>' +
-        '<div class="stat"><b>' + TOPICS.length + '</b><span>DEEP DIVES</span></div>' +
-        '<div class="stat"><b>' + total + '</b><span>DAILY PAGES</span></div>' +
-        '<div class="stat"><b>' + EXP_DAYS.length + '</b><span>DETAILED DAYS (' + expDone + ' ✅)</span></div>' +
-      "</div>" +
-      '<div class="cta-row">' +
-        '<button class="cta" data-ql="start">▶️ Start Day 1 — DevOps Culture</button>' +
-        '<button class="cta secondary" data-ql="resume">Continue — Day ' + nextUndone() + "</button>" +
-        '<button class="cta secondary" data-ql="setup">🔧 Day 0 — Setup</button>' +
-        '<button class="cta secondary" data-ql="lab">🧪 Practice Lab</button>' +
-        '<button class="cta secondary" data-ql="interview">🎯 Interview Q&amp;A</button>' +
-        '<button class="cta secondary" data-ql="help">💡 Help & Debug</button>' +
-        '<button class="cta secondary" data-ql="chat">💬 Chaal Se Puchho</button>' +
-        '<button class="cta secondary" data-ql="palette">🔎 Quick Launch (Ctrl+K)</button>' +
-      "</div>" +
-      '<div class="tech-chips"><span class="tech"><b>Git</b></span><span class="tech"><b>Docker</b></span><span class="tech"><b>Kubernetes</b></span><span class="tech"><b>Terraform</b></span><span class="tech"><b>Azure</b></span><span class="tech"><b>ArgoCD</b></span><span class="tech"><b>Istio</b></span><span class="tech"><b>Kyverno</b></span><span class="tech"><b>Vault</b></span><span class="tech"><b>Prometheus</b></span><span class="tech"><b>Grafana</b></span><span class="tech"><b>dbt</b></span><span class="tech"><b>KEDA</b></span><span class="tech"><b>cosign</b></span></div>' +
-    "</div>" +
-    '<div class="acc open" id="acc-learn">' +
-      '<div class="acc-head" data-seg="learn" role="button" tabindex="0">' +
-        '<span class="acc-ic">📚</span>' +
-        '<span class="acc-txt">Learn<span class="acc-sub">Deep Dives + Concept Days + Kaise Padhna Hai</span></span>' +
-        '<span class="acc-count">' + (TOPICS.length + conceptCount()) + ' items</span>' +
-        '<span class="acc-prog">' + conDoneCount() + ' ✅</span>' +
-        '<span class="acc-chev">▾</span>' +
-      '</div>' +
-      '<div class="acc-body" id="seg-learn">' +
-        "<h2>📚 Learning Topics (10 domains — Networking, Linux, Docker, K8s…) </h2>" +
-        '<div id="topicGrid" class="grid"></div>' +
-        "<h2>🧠 Concept Days (theory, notes-tak)</h2>" +
-        '<div id="conceptGrid" class="grid"></div>' +
-        "<h2>🧠 Kaise Padhna Hai</h2>" +
-        "<ol>" +
-          "<li><strong>Day 0 pehle:</strong> Tools install + verify (setup-check.sh) — phir hi aage badho.</li>" +
-          "<li><strong>Roz ek day:</strong> Concept padho → Diagram dekho → Copy-paste Demo chalao → Lab karo.</li>" +
-          "<li><strong>Practice zaroori hai:</strong> Bas padhne se nahi hoga — har command khud chalao.</li>" +
-          "<li><strong>Week ke aakhri din</strong> (7, 14, 21, 28) = review + capstone challenge.</li>" +
-          "<li><strong>Atak gaye?</strong> 💡 Help & Debug page kholo ya chatbot se puchho.</li>" +
-          "<li><strong>Day 29-31:</strong> DeployTrack project (CI/CD + K8s + Terraform + monitoring) + final Azure lecture.</li>" +
-          "<li><strong>Day 32-50:</strong> Advanced — GitOps, Service Mesh, Policy, Secrets, FinOps, Chaos, DR, Multi-Cloud, Serverless, MLOps, DataOps, API/Microservices, Perf, Supply-chain, Security, Grand Capstone.</li>" +
-        "</ol>" +
-      '</div>' +
-    '</div>' +
-    '<div class="acc" id="acc-practice">' +
-      '<div class="acc-head" data-seg="practice" role="button" tabindex="0">' +
-        '<span class="acc-ic">🧪</span>' +
-        '<span class="acc-txt">Practice<span class="acc-sub">Week-by-Week + Saare Pages + Detailed Core (Day 1-30)</span></span>' +
-        '<span class="acc-count">' + practiceCount() + ' items</span>' +
-        '<span class="acc-prog">' + practiceDoneCount() + ' ✅</span>' +
-        '<span class="acc-chev">▾</span>' +
-      '</div>' +
-      '<div class="acc-body" id="seg-practice">' +
-        '<div class="seg-cta-row">' +
-          '<button class="cta" data-ql="start">▶️ Start Day 1</button>' +
-          '<button class="cta secondary" data-ql="lab">🧪 Practice Lab (sandbox)</button>' +
-          '<button class="cta secondary" data-ql="resume">Continue</button>' +
-        '</div>' +
-        "<h2>🗓️ Week-by-Week Roadmap</h2>" +
-        '<div id="weekGrid" class="grid"></div>' +
-        "<h2>📅 Saare " + DAYS.length + " Pages (labs/commands/Tickets)</h2>" +
-        '<div id="dayGrid" class="grid"></div>' +
-        "<h2>📗 Detailed Track — Core (Day 1-30, full LEARN→LAB→TICKETS)</h2>" +
-        '<div id="expCoreGrid" class="grid"></div>' +
-      '</div>' +
-    '</div>' +
-    '<div class="acc" id="acc-platform">' +
-      '<div class="acc-head" data-seg="platform" role="button" tabindex="0">' +
-        '<span class="acc-ic">🛠️</span>' +
-        '<span class="acc-txt">Platform<span class="acc-sub">Platform Engineering Track + Advanced Class + Platform Deep Dives</span></span>' +
-        '<span class="acc-count">' + platformCount() + ' items</span>' +
-        '<span class="acc-prog">' + platformDoneCount() + ' ✅</span>' +
-        '<span class="acc-chev">▾</span>' +
-      '</div>' +
-      '<div class="acc-body" id="seg-platform">' +
-        "<h2>🛠️ Platform Engineering Track (Day 31-40)</h2>" +
-        '<div id="expPlatformGrid" class="grid"></div>' +
-        "<h2>📈 Advanced Class (Day 32-50)</h2>" +
-        '<div id="advGrid" class="grid"></div>' +
-        "<h2>🛠️ Platform Deep Dives</h2>" +
-        '<div id="platformTopicGrid" class="grid"></div>' +
-      '</div>' +
-    '</div>' +
-    '<div id="todayBox" class="notice"></div>' +
-    "<p>Day complete karo toh sidebar mein ✓ aur progress bar badega. 🎯</p>" +
-  "</div>";
-}
 
 function buildWeekCards() {
   return WEEKS.filter(w => w.key !== -1).map(w => {
@@ -906,7 +1125,7 @@ function topicCard(t) {
   return '<a class="card" href="#topic-' + t.slug + '" onclick="loadTopic(\'' + t.slug + '\')">' +
     '<div><span class="card-num">📚</span> <span class="card-type">' + t.tag + "</span></div>" +
     '<div class="card-title">' + t.title + "</div>" +
-    '<div class="card-sub">' + (t.days.map(d => "Day " + d).join(" · ")) + " se connected</div></a>";
+    '<div class="card-sub">' + (t.desc || "Standalone deep dive — day se independent") + "</div></a>";
 }
 
 function buildTopicCards() {
@@ -973,7 +1192,7 @@ function buildAdvCards() {
 
 function buildPlatformTopicCards() {
   return TOPICS.filter(t => PLATFORM_SLUGS.has(t.slug)).map(t =>
-    cardHTML("📚", t.tag, t.title, t.days.map(d => "Day " + d).join(" · ") + " se connected", "#topic-" + t.slug, "loadTopic('" + t.slug + "')", false));
+    cardHTML("📚", t.tag, t.title, "Standalone platform deep dive", "#topic-" + t.slug, "loadTopic('" + t.slug + "')", false));
 }
 
 /* ---------- Palette (Ctrl+K Quick Launch) ---------- */
@@ -985,10 +1204,10 @@ function paletteSections() {
       hint: (d.week > 0 ? "Week " + d.week : d.week === 0 ? "Capstone" : "Setup") + " · " + d.type + (isDone(d.num) ? " ✓done" : ""),
       go: () => loadDay(d.num)
     })) },
-    { group: "Deep Dives", items: TOPICS.map(t => ({
+    { group: "Deep Dives (independent)", items: TOPICS.map(t => ({
       num: "📚",
       title: t.title,
-      hint: t.tag + " · " + t.days.map(d => "Day " + d).join(" & "),
+      hint: t.tag + (t.desc ? " · " + t.desc : ""),
       go: () => loadTopic(t.slug)
     })) },
     { group: "Detailed Days", items: EXP_DAYS.map(d => ({
@@ -997,8 +1216,15 @@ function paletteSections() {
       hint: (EXP_PHASES.find(p => p.key === d.phase) || { name: "" }).name + " · " + d.type + (isExpDone(d.n) ? " ✓done" : ""),
       go: () => loadExpanded(d.n)
     })) },
+    { group: "DevOps Topics (40 modules)", items: TOPIC_MODULES.map(m => ({
+      num: m.emoji,
+      title: m.title + " (topic module)",
+      hint: "L" + m.level + " · " + m.tagline + (modulePct(m.slug) ? " · " + modulePct(m.slug) + "%" : ""),
+      go: () => loadModule(m.slug)
+    })) },
     { group: "Actions", items: [
       { num: "⌂", title: "Start Here (Home)", hint: "landing page", go: () => loadStart() },
+      { num: "🗂️", title: "DevOps Topics Dashboard", hint: "40 independent topic modules — 50-day se alag", go: () => loadTopicsDashboard() },
       { num: "🎯", title: "Interview Q&A (all days)", hint: "questions + tricky", go: () => loadInterviews(null) },
       { num: "🧪", title: "Practice Lab (sandbox terminal)", hint: "dummy cloud practice", go: () => loadLab() },
       { num: "💡", title: "Help & Debug", hint: "problem? yahan dekho", go: () => loadHelp() },
@@ -1083,16 +1309,23 @@ function srchIndex() {
     topics: TOPICS.map(t => ({ t, words: new Set(srchWords((t.title + " " + t.tag + " " + (getContent(t.file) || "")))) })),
     days: DAYS.map(d => ({ d, words: new Set(srchWords((d.title + " " + d.short + " " + (getContent(d.file) || "")))) })),
     exp: EXP_DAYS.map(d => ({ d, words: new Set(srchWords((d.title + " " + d.short + " " + (getContent(d.file) || "")))) })),
+    modules: TOPIC_MODULES.map(m => ({ m, words: new Set(srchWords((m.title + " " + m.tagline + " " + (getContent("modules/" + m.slug + ".md") || "")))) })),
   };
   return _SRCH;
 }
 function topSearchHits(q) {
-  const { topics, days, exp } = srchIndex();
+  const { topics, days, exp, modules } = srchIndex();
   const isNum = /^\d+$/.test(q);
   const tRank = (x) => {
     const t = x.t;
     const s = (t.title + " " + t.tag + " " + t.slug).toLowerCase();
     if (s.includes(q)) return 0;
+    if (!isNum && [...x.words].some(w => w.startsWith(q))) return 3;
+    return 99;
+  };
+  const mRank = (x) => {
+    const m = x.m;
+    if ((m.title + " " + m.tagline + " " + m.slug).toLowerCase().includes(q)) return 0;
     if (!isNum && [...x.words].some(w => w.startsWith(q))) return 3;
     return 99;
   };
@@ -1110,6 +1343,7 @@ function topSearchHits(q) {
   };
   const pick = (arr, rankFn) => arr.map(x => ({ x, r: rankFn(x) })).filter(v => v.r < 9).sort((a, b) => a.r - b.r || 0).slice(0, 8).map(v => v.x);
   return {
+    modules: pick(modules, mRank).slice(0, 5),
     topics: pick(topics, tRank),
     days: pick(days, dRank).slice(0, 6),
     exp: pick(exp, eRank).slice(0, 4),
@@ -1121,8 +1355,9 @@ function renderTopDrop() {
   const drop = document.getElementById("topSearchDrop");
   const q = (inp.value || "").trim().toLowerCase();
   if (!q) { drop.hidden = true; drop.innerHTML = ""; return; }
-  const { topics, days, exp, actions } = topSearchHits(q);
+  const { topics, days, exp, actions, modules } = topSearchHits(q);
   const groups = [];
+  if (modules.length) groups.push({ name: "DevOps Topics", items: modules.map(x => ({ num: x.m.emoji, title: x.m.title + " (topic module)", hint: "L" + x.m.level + " · " + x.m.tagline, go: () => loadModule(x.m.slug) })) });
   if (topics.length) groups.push({ name: "Deep Dives", items: topics.map(x => ({ num: "📚", title: x.t.title, hint: x.t.tag + " · " + x.t.days.map(d => "Day " + d).join(" & "), go: () => loadTopic(x.t.slug) })) });
   if (days.length) groups.push({ name: "Days", items: days.map(x => ({ num: "D" + x.d.num, title: "Day " + x.d.num + ": " + x.d.title, hint: (x.d.week > 0 ? "Week " + x.d.week : x.d.week === 0 ? "Capstone" : "Setup") + " · " + x.d.type, go: () => loadDay(x.d.num) })) });
   if (exp.length) groups.push({ name: "Detailed Days", items: exp.map(x => ({ num: "📗" + x.d.n, title: "Detailed " + x.d.title, hint: (EXP_PHASES.find(p => p.key === x.d.phase) || { name: "" }).name + " · " + x.d.type, go: () => loadExpanded(x.d.n) })) });
@@ -1357,6 +1592,7 @@ els.prevBtn.addEventListener("click", () => {
   else if (current === -4) loadInterviews(interviewDay);
   else if (current === -5) loadLab();
   else if (current === -2) loadStart();
+  else if (current === -11) loadTopicsDashboard();
   else if (current <= 0) loadStart();
   else if (current >= 1000) {
     const d = EXP_DAYS.find(x => x.n === current - 1000 - 1);
@@ -1369,6 +1605,7 @@ els.nextBtn.addEventListener("click", () => {
   else if (current === -4) loadStart();
   else if (current === -5) loadStart();
   else if (current === -2) loadDay(1);
+  else if (current === -10 || current === -11) loadStart();
   else if (current >= 1000) {
     const d = EXP_DAYS.find(x => x.n === current - 1000 + 1);
     if (d) loadExpanded(d.n); else loadStart();
@@ -1383,7 +1620,7 @@ els.markDoneBtn.addEventListener("click", () => {
   else if (current >= 0) { toggleDone(current); markDoneReflect(); }
 });
 els.resetBtn.addEventListener("click", () => {
-  if (confirm("Saara progress delete karna hai? (completed days + checklists)")) {
+  if (confirm("Saara progress delete karna hai? (completed days + checklists — DevOps Topics progress isme nahi aata)")) {
     localStorage.removeItem(PROGRESS_KEY);
     localStorage.removeItem(EXP_PROGRESS_KEY);
     DAYS.forEach(d => localStorage.removeItem("devclo-day-" + d.num));
@@ -1394,6 +1631,8 @@ els.resetBtn.addEventListener("click", () => {
     else if (current === -3) loadTopic(topicSlug);
     else if (current === -4) loadInterviews(interviewDay);
     else if (current === -5) loadLab();
+    else if (current === -10) loadTopicsDashboard();
+    else if (current === -11) loadModule(currentModuleSlug);
     else if (current >= 1000) loadExpanded(current - 1000);
     else loadDay(current);
   }
@@ -1403,6 +1642,8 @@ document.getElementById("brandBtn").addEventListener("click", loadStart);
 document.getElementById("helpBtn").addEventListener("click", loadHelp);
 const interviewBtn = document.getElementById("interviewBtn");
 if (interviewBtn) interviewBtn.addEventListener("click", () => loadInterviews(null));
+const topicsBtn = document.getElementById("topicsBtn");
+if (topicsBtn) topicsBtn.addEventListener("click", () => loadTopicsDashboard());
 
 /* task checkboxes */
 els.content.addEventListener("change", ev => {
@@ -1422,6 +1663,20 @@ els.content.addEventListener("change", ev => {
   renderSidebar();
 });
 
+/* module (DevOps Topics) checkboxes — alag progress key, 50-day course se independent */
+els.content.addEventListener("change", ev => {
+  const cb = ev.target;
+  if (!cb.classList.contains("task-cb") || current !== -11 || !currentModuleSlug) return;
+  const boxes = Array.from(els.content.querySelectorAll("input.task-cb"));
+  const idx = boxes.indexOf(cb);
+  if (idx < 0) return;
+  let state = getModuleTaskState(currentModuleSlug);
+  if (cb.checked) { if (state.indexOf(idx) < 0) state.push(idx); }
+  else { state = state.filter(i => i !== idx); }
+  saveModuleTaskState(currentModuleSlug, state.sort((a, b) => a - b));
+  updateModuleHead();
+});
+
 /*---------- keyboard shortcuts ----------*/
 document.addEventListener("keydown", ev => {
   const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
@@ -1433,7 +1688,8 @@ document.addEventListener("keydown", ev => {
     else if (!document.getElementById("chatPanel").hidden) toggleChat(false);
   } else if (ev.key === "/" && !typing && document.getElementById("chatPanel").hidden) {
     ev.preventDefault();
-    els.sideSearch.focus();
+    const ts = document.getElementById("topSearchInput");
+    if (ts) ts.focus();
   }
 });
 
@@ -1442,6 +1698,10 @@ function init() {
   const hash = window.location.hash;
   if (hash === "#help" || hash === "#help-debug") return loadHelp();
   if (hash === "#lab") return loadLab();
+  if (hash === "#learn") return loadLearn();
+  if (hash === "#platform") return loadPlatform();
+  if (hash === "#topics") return loadTopicsDashboard();
+  if (hash && hash.startsWith("#module-")) return loadModule(hash.slice(8));
   if (hash === "#interviews") return loadInterviews(null);
   if (hash && hash.startsWith("#interview-")) return loadInterviews(parseInt(hash.slice(11), 10));
   if (hash && hash.startsWith("#topic-")) return loadTopic(hash.slice(7));
@@ -1457,8 +1717,8 @@ function init() {
 }
 
 window.App = {
-  DAYS, TOPICS, EXP_DAYS, EXP_PHASES, getProgress, isDone, isExpDone, current: () => current,
-  loadDay, loadExpanded, loadStart, loadHelp, loadTopic, loadInterviews, loadLab,
+  DAYS, TOPICS, EXP_DAYS, EXP_PHASES, TOPIC_MODULES, TOPIC_LEVELS, getProgress, isDone, isExpDone, current: () => current,
+  loadDay, loadExpanded, loadStart, loadHelp, loadTopic, loadInterviews, loadLab, loadTopicsDashboard, loadModule, modulePct,
   openPalette, toggleChat, nextUndone, activateSeg, gotoSeg,
   hash: () => window.location.hash,
 };
@@ -1479,6 +1739,13 @@ window.addEventListener("hashchange", () => {
   }
   if (h === "#help" || h === "#help-debug") { if (current !== -2) loadHelp(); return; }
   if (h === "#lab") { if (current !== -5) loadLab(); return; }
+  if (h === "#learn") { if (current !== -6) loadLearn(); return; }
+  if (h === "#platform") { if (current !== -7) loadPlatform(); return; }
+  if (h === "#topics") { if (current !== -10) loadTopicsDashboard(); return; }
+  if (h && h.startsWith("#module-")) {
+    const s = h.slice(8);
+    if (!(current === -11 && currentModuleSlug === s)) return loadModule(s);
+  }
   if (h === "#interviews") { if (current !== -4) loadInterviews(null); return; }
   if (h && h.startsWith("#interview-")) {
     const n = parseInt(h.slice(11), 10);

@@ -1,6 +1,6 @@
 # Deep Dive: Load Balancing & Reverse Proxy — Traffic Ko Banta Hai
 
-> **Kaha ka hai:** Day 5 (network) + Day 16/21 (compose/K8s) + Day 46 (API). Production me **app sirf ek server pe nahi chalti** — load balancer ke peeche. Ye DevOps ka core architecture skill hai.
+> **Standalone deep dive:** Production me **app sirf ek server pe nahi chalti** — load balancer ke peeche. Ye DevOps ka core architecture skill hai.
 
 ---
 

@@ -17,6 +17,52 @@ Survival not about "will it break" but "when it breaks, what's the recovery stor
 
 Tools: **Velero** (K8s backup to object storage + restore), **Azure Backup** (VM/DB/file), **ASR (Azure Site Recovery)** (replicate VM to DR region, failover test), **Azure SQL geo-replication** (PAAS copy), **Azure Front Door / Traffic Manager** (traffic steering).
 
+### DR ka matlab — "when", not "if"
+
+DR (Disaster Recovery) ka sawal ye nahi hai ki disaster **hoga ya nahi** — data center outage, ransomware, bad deploy, region failure — kuch na kuch **kabhi na kabhi** hoga. Sawal hai: us din business kitni jaldi wapas chalega aur kitna data wapas aayega. Isliye do numbers pehle likho: **RTO** (Recovery Time Objective — max downtime business tolerate kar sakega, e.g., 2 ghante) aur **RPO** (Recovery Point Objective — max data loss acceptable, e.g., last 15 min ya bilkul 0). Ye do numbers hi poori architecture decide karte hain — RPO 0 chahiye to real-time **replication** chahiye (backup nahi chalega), RTO 6 ghante hai to manual restore bhi chalega. Simple analogy: backup = insurance, DR plan = accident ka emergency number — insurance akela kaam ka nahi jab raat 2 baje bulaana ho.
+
+### RTO/RPO — numbers jo design decide karte hain
+
+| Term | Matlab | Example | Driven by |
+|---|---|---|---|
+| **RTO** | max restore time | 2h, 15min | revenue/min of downtime |
+| **RPO** | max data loss window | 24h, 15min, 0 | data value (orders vs logs) |
+
+RPO 24h hai to **daily backup** kaafi; RPO 15min hai to hourly/daily dump nahi — **replication** ya continuous log shipping chahiye; RPO 0 chahiye to sync replication (jo latency/deta hai — hamesha possible nahi). RTO 5min hai to restore manually nahi hoga — **warm/hot standby** chahiye. Ye equation interview me aksar aata hai: *"E-commerce ke liye RTO/RPO kya rakhoge?"* → checkout down = direct revenue loss, to RTO minute-level (hot standby); payment records = RPO ~0 (geo-replica), logs = RPO 24h bhi chalega. Har component ka RTO/RPO alag ho sakta hai — tier-wise decide karo.
+
+### DR tiers — kitna ready rakhna hai
+
+Chaar classic tiers (cost vs speed ka trade-off):
+
+- **Level 0 — Backup & Restore**: sirf backups; DR site nahi. RTO/RPO = hours-din; sabse sasta. Dev/non-critical ke liye.
+- **Level 1 — Pilot Light**: chhota control/data replicated rehta hai (e.g., DB replica chalu, app deploy nahi); failover pe app spin hota hai. RTO ~tens of minutes.
+- **Level 2 — Warm Standby**: mini version prod ka chalu rehta hai (smaller scale); traffic badhao, scale-up karo. RTO minutes.
+- **Level 3 — Hot Standby / Active-Active**: dono sites live, traffic split (Front Door/Geo-DNS). RTO ~seconds; sabse mehnga.
+
+Ye ladder hai — sab tier 3 ki zaroorat nahi. Tier decide karo: criticality * RTO/RPO * budget. Azure me **paired regions** hote hain (East US <-> West US) — paired region isliye ki replication aur updates coordinate ho sake.
+
+### Backup vs DR — dono alag cheez hain
+
+Ek bada confusion: "backup hai to DR hai" — nahi. **Backup** = data ki point-in-time copy (kaam aati hai corruption, user delete, ransomware me); **DR** = pura system wapas chalana (infra + app + data + config + traffic). Backup lene ka kaam easy hai, **restore** ka test nahi kiya to wo "paper backup" hai — industry me sabse common failure: "backups 2 saal se chal rahe the, restore pe pata chala corrupt the". Rule: **backup tabhi hai jab restore test hua ho**. Aur DR me sirf data nahi chahiye — Terraform se infra re-create, GitOps se manifests, secrets, DNS/Traffic Manager switch, aur **runbook** (kaun kya karega) — ye sab bhi chahiye. Isliye Velero (k8s resources + PVC) alag hai, Azure Backup (VM disks) alag, SQL geo-replica alag — teeno ka role alag hai.
+
+### Tools ka role — Velero, ASR, geo-replica, Front Door
+
+- **Velero**: k8s ka backup tool — cluster resources (deployments, services, configmaps) + PVCs ko object storage (blob/S3) me dump karta hai; schedule + restore + cluster migrate bhi. K8s recreate → Velero restore = app wapas.
+- **Azure Backup**: VM/file share/DB ke managed backups — policy (daily/weekly + retention), vault me restore points.
+- **ASR (Azure Site Recovery)**: VM disk **replication** DR region me + ordered **recovery plans** + sabse zaroori — **test failover** bina prod impact ke. Backup se zyada "site failover" hai.
+- **SQL geo-replication / Cosmos multi-region**: PaaS tier pe HA built-in — failover endpoint switch, RPO ~0 possible.
+- **Front Door / Traffic Manager**: traffic ko primary se secondary me **steer** karna (health probe based). DR me yehi "switch" aapke paas hai.
+
+Sawaal: "AKS app ka DR kaise?" → infra = Terraform re-run, state = Velero, DB = geo-replica, traffic = Front Door — combined answer chahiye.
+
+### Testing — drill bina DR ka koi value nahi
+
+DR plan tab tak **hypothesis** hai jab tak test nahi hua. Monthly/quarterly **recovery drill** chalao: primary simulate down → failover trigger → time note karo (**actual RTO**) → data check karo (**actual RPO**) → runbook update → **failback** bhi test karo (wapas primary pe jaana failover jitna hi mushkil hota hai). ASR ka **test failover** feature isliye hai — isolated environment me, production pe bina effect ke. Metrics log karo: "Target RTO 2h, actual 45min — pass". Common traps: restore test kabhi nahi, retention zero (compliance fail), same-region vault (region down to backup bhi gaya), failback ka plan hi nahi. Chaos ke saath pair karo (Day 40): gameday me pod-kill + failover dono. Interview me: *"DR test kab kiya tha?"* — iska jawab date ke saath hona chahiye.
+
+### Interview angle — DR ke sawal
+
+Common asks: (a) "RTO/RPO define karo" → downtime vs data loss, examples ke saath. (b) "DR options batao" → 4 tiers with cost/speed. (c) "0 RPO kaise doge?" → sync replication (SQL primary/secondary sync mode), active-active writes (Conflict-free/Quorum) — trade-offs latency/complexity. (d) "backup vs DR difference" → restore file vs run whole site. (e) "k8s DR tool?" → **Velero**. (f) "failover kaise trigger hota hai?" → health-probe based (Front Door/Traffic Manager) ya manual recovery plan. Bonus: RPO/RPO mismatch = "daily backup but requirement was 15 min" — replication chahiye tha. Ek line: DR = "written + tested + numbers-driven", else it's just hope.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] RPO/RTO taxonomy + DR tiers (Backup < Pilot < Warm < Hot)

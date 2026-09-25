@@ -1,6 +1,6 @@
 # Deep Dive: GitOps — ArgoCD & Flux, Declarative Delivery Done Right
 
-> **Kaha ka hai:** Day 32 ka gahra version. Git = single source of truth; operator (ArgoCD/Flux) cluster ko Git ke desired state pe continuously sync karta hai. Manual `kubectl atax` = khaatarnaak.
+> **Standalone deep dive:** Git = single source of truth; operator (ArgoCD/Flux) cluster ko Git ke desired state pe continuously sync karta hai. Manual `kubectl atax` = khaatarnaak.
 
 ---
 

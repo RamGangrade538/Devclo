@@ -1,6 +1,6 @@
 # Deep Dive: FinOps & Cloud Cost Optimization — Visibility, Rightsizing, Budgets
 
-> **Kaha ka hai:** Day 39 ka gahra version. Cloud spend is governance-able: Inform → Optimize → Operate. Whoever creates resources owns their cost (showback/chargeback). From $0 → $1M apps, discipline scales.
+> **Standalone deep dive:** Cloud spend is governance-able: Inform → Optimize → Operate. Whoever creates resources owns their cost (showback/chargeback). From $0 → $1M apps, discipline scales.
 
 ---
 

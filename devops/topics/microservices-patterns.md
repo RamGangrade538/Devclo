@@ -1,6 +1,6 @@
 # Deep Dive: Microservices & APIs — Resilience Patterns, Gateway, Versioning, Observability
 
-> **Kaha ka hai:** Day 46 ka gahra version. Microservices succeed when communication is deliberate: API gateway at edge, resilience bank in-service, events for the rest, versioning + traces everywhere.
+> **Standalone deep dive:** Microservices succeed when communication is deliberate: API gateway at edge, resilience bank in-service, events for the rest, versioning + traces everywhere.
 
 ---
 

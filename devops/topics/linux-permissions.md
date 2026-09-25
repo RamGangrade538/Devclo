@@ -1,6 +1,6 @@
 # Deep Dive: Linux File Permissions — rwx Ka Poora Kala
 
-> **Kaha ka hai:** Day 3 ka gahra version. Permissions = security ki **pehli deewar**. Har DevOps engineer ko soye-jagte ye yaad hona chahiye.
+> **Standalone deep dive:** Permissions = security ki **pehli deewar**. Har DevOps engineer ko soye-jagte ye yaad hona chahiye.
 
 ---
 

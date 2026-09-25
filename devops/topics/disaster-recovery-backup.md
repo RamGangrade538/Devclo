@@ -1,6 +1,6 @@
 # Deep Dive: Disaster Recovery & Backup — RTO/RPO, Velero, Site Recovery, Multi-region
 
-> **Kaha ka hai:** Day 41 ka gahra version. DR isn't "backup exists" — it's RTO/RPO targets + a tested, documented plan. Choose tier by risk acceptance.
+> **Standalone deep dive:** DR isn't "backup exists" — it's RTO/RPO targets + a tested, documented plan. Choose tier by risk acceptance.
 
 ---
 

@@ -1,6 +1,6 @@
 # Deep Dive: Python for DevOps Automation — Scripts Se Platform Tak
 
-> **Kaha ka hai:** Day 4/13 (bash) ka Python sidekick. Bash = quick admin; **Python = jahan loops/APIs/parsing/CI scripting** baat aati hai. Sab modern DevOps tooling (Ansible, boto3, azure-sdk, dbt, MLflow) Python ka API deta hai.
+> **Standalone deep dive:** Bash = quick admin; **Python = jahan loops/APIs/parsing/CI scripting** baat aati hai. Sab modern DevOps tooling (Ansible, boto3, azure-sdk, dbt, MLflow) Python ka API deta hai.
 
 ---
 

@@ -15,6 +15,55 @@ Source+CI (GitHub Actions)
 ```
 Multi-env: prod/staging/dev via kustomize overlays; everything Git + code — no clicks.
 
+### Capstone ka maksad — 50 din ka ek system me
+
+Ye din alag-alag tool ki list nahi hai — **integration** ka din hai. 50 days me tumne har capability ek isolation me seekhi (CI alag, monitoring alag, DR alag) — asli DevOps me ye sab **ek connected system** ka part hote hain jahan ek ka output doosre ka input hai: CI jo build+sign karta hai wahi GitOps ko manifest update deta hai, cluster jo run karta hai wahi Prometheus ko metrics deta hai, Kubecost jo bill dikhata hai wahi budget alert bhi deta hai. Capstone ka educational point: **"glue" me hi asli engineering hai** — tools connect karte waqt boundaries, credentials, failure modes milte hain (prod me kya hota hai jab ArgoCD down ho, alerts kaise aate hain, rollback kaise hota hai). Portfolio angle: interview me "50 tools ka list" nahi chalta — **ek system with rationale** chalta hai ("maine X isliye choose kiya kyunki Y"). To is day ka output = working platform + decision log + evidence (screenshots, runbooks).
+
+### Reference architecture — kyun ye components
+
+Upar wali architecture ko tod ke samjho, har line ka "kyun":
+
+| Layer | Component | Rationale (kyun yahi) |
+|---|---|---|
+| Source/CI | GitHub Actions, pinned SHA | code → artifact, gates (test/lint/scan), OIDC |
+| Supply chain | trivy + syft + cosign | Day 48 — signed, SBOM'd images only |
+| GitOps | ArgoCD + kustomize overlays | desired state in Git; drift detect; env promotion |
+| Runtime | AKS + Kyverno + ESO + Istio | policy admission, secretless, mTLS/traffic |
+| Observability | Prom/Tempo/Loki + Grafana + SLO | measure everything; error budgets |
+| FinOps/Spend | Kubecost + Azure budgets | cost visibility day-1 se (Day 39) |
+| DR/Chaos | Velero/ASR + Litmus gameday | tested recovery, not paper (Day 40-41) |
+| Security ops | Defender + Sentinel | detect/respond (Day 49) |
+
+Note: kuch cheezein **jaan-bujh kar chhoti** rakhi gayi hain (single cluster, simple app) — capstone me scope > perfection; par layers ki **order aur boundaries** sahi honi chahiye. "Everything as code" yahan dikhna chahiye: infra = Terraform, cluster config = GitOps, policy = Kyverno YAML, secrets = sealed/ESO, pipelines = workflow files — clicks = 0.
+
+### Multi-env strategy — dev/staging/prod kaise alag hain
+
+Pattern: ek **base** (common manifests: deployment, service, probes, limits, networkpolicy) + har env ka **overlay** (sirf farak: image tag, replicas, resource sizes, enabled features). Kustomize se: `base/` + `overlays/{dev,staging,prod}` — same YAML, parameterized. Farak: **dev** = 1 replica, chhota, non-prod data, aggressive scale-down; **staging** = prod jaisa (3 replicas, same policies) — wahan load test + DR drill; **prod** = 5 replicas, SLI/SLO monitors, canary via Istio, strictest policy. Secrets env-wise (different Key Vault scopes). ArgoCD me **ek Application per env** (App-of-Apps pattern) — sync status = env health. Drift: Git me jo likha wahi chalna chahiye; kisi ne kubectl se manually patch kiya to Argo **self-heal** wapas laata hai — ye GitOps ka core value hai. Bonus: image tag update = CI ka ek commit → auto-promote staging → approval se prod (progressive delivery).
+
+### CI/CD gates — quality ka darwaza
+
+Pipeline ka job sirf build nahi — **quality ka gate** hai. Order (fail-fast chhota se mehnga): (1) unit tests, (2) **lint** (golangci-lint — style+bugs), (3) **SAST/SCA** (code + dependencies vuln), (4) build image (multi-arch, distroless — chhoti attack surface), (5) **trivy image scan** (HIGH/CRITICAL = exit 1 → build fail), (6) **SBOM (syft) + cosign sign** (Day 48), (7) **commit updated manifest** to GitOps repo (tag = `$GITHUB_SHA` — traceability), (8) ArgoCD sync staging → smoke tests → manual/prod canary. Har gate non-zero exit = pipeline rokti hai — **enforcement > discipline** (yaad rakho Day 04 ka exit code wala lesson — wahi yahan 20 gate lag chuki hai). Rollback: GitOps me image tag revert = Argo sync = rollback — 1 commit. Key metrics track karo: lead time, deploy frequency, change fail rate, MTTR (DORA) — capstone report me dikhana.
+
+### Observability + SLO — RED, budgets, alerts
+
+Run karne ke baad "chal raha hai" prove karne ke liye: **metrics** (Prometheus — RED per service: rate, errors, duration percentiles), **traces** (Tempo — ek request ka journey across services), **logs** (Loki — correlate via labels/trace-id). Grafana me **SLO dashboard**: availability 99.95%, latency p99 < X; **error budget** = kitna failure afford hai — budget burn rate alerts (fast burn = page, slow burn = ticket). Alert rules me runbook link compulsory (Day 27) — bina runbook alert noise hai. Dashboard ka set: (1) golden signals per app, (2) cluster health, (3) Kubecost per namespace, (4) CI/CD health, (5) security posture (Defender score). Interview me: "monitoring kya doge ek naye service ko?" → RED + SLO + structured logs + traces + runbook-linked alerts — 5 cheezein.
+
+### Security + spend + DR wiring — end-to-end
+
+Ek platform me teeno **side-rails** (features ke saath chalte hain): **Security**: Kyverno policies (no `:latest`, limits required, verify-images ghcr.io/* only — admission gate), ESO se secrets Key Vault se (workload identity — Day 35), Defender posture + Sentinel rules (unusual sign-in, key use), network policies default-deny (Day 49). **Spend**: Kubecost per namespace + Azure budget alert 80/90/100% + right-sizing review (Day 39) — "platform without cost control = open cheque". **DR/Resilience**: Velero daily backup GRS blob + SQL geo-replica + Front Door failover plan + **gameday** (Litmus pod-kill → kya HPA/self-heal karta hai? → SQL failover drill → runbook update — Day 40-41). Sawaal interview me: "bade system me sabse pehle kya?" → answer: SLO + backup + budget alerts (visibility trio) — kyunki inke bina tum andhe, andhe system nahi scale kar sakte.
+
+### Deliverables — kaise present karo (interview/portfolio)
+
+Capstone ki real value presentation me hai — **evidence-based** portfolio:
+
+1. **Architecture doc** — diagram + per-decision rationale ("chose ArgoCD over Flux because...", trade-offs likho).
+2. **Working repo** — workflows, overlays, policies, Terraform — public ya demo link; clean README (setup steps + architecture mermaid).
+3. **Evidence pack**: CI pipeline screenshots (gates passing), ArgoCD 3-env sync, Grafana SLO dashboards, Kubecost savings, signed image `cosign verify` output, Kyverno rejecting unsigned pod.
+4. **DR/gameday report**: date, experiments, actual RTO/RPO vs target, findings + fixes — ye report hi 90% candidates ke paas nahi hoti.
+5. **30-60s walkthrough video/gif** + 1-page demo guide (kitna bhi bana ho, dikhana aana chahiye).
+
+Interview me isko **STAR/story** banao: "system tha jo X tha; maine Y integrate kiya Z reason se; result: deploy time 30min → 4min, p99 improved X%, bill Y% kam". Yehi 50 din ka final output hai — tool list nahi, **system + judgment + proof**. Congrats — ab Interview Corner me 200+ questions isi foundation pe hain.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] Full reference architecture diagram (components list + rationale)

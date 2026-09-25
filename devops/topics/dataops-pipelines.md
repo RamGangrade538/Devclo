@@ -1,6 +1,6 @@
 # Deep Dive: Data Pipelines & DataOps — ETL/ELT, Data Factory, dbt, Data Quality, Contracts
 
-> **Kaha ka hai:** Day 45 ka gahra version. Data is a product: versioned schemas, tested (quality gates), scheduled, monitored (freshness), CI/CD-able (dbt in a pipeline like app code).
+> **Standalone deep dive:** Data is a product: versioned schemas, tested (quality gates), scheduled, monitored (freshness), CI/CD-able (dbt in a pipeline like app code).
 
 ---
 

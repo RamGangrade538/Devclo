@@ -1,6 +1,6 @@
 # Deep Dive: Deployment Strategies — Zero-Downtime Aur Rollback Ka Science
 
-> **Kaha ka hai:** Day 8 (CI/CD) + Day 19 (K8s rollout) + Day 32/33 (GitOps/mesh) ka joint. Jo engineer **deploy strategies padh ke select** karta hai, wahi 'senior' hai. Ye table-answer hi interview me score karta hai.
+> **Standalone deep dive:** Jo engineer **deploy strategies padh ke select** karta hai, wahi 'senior' hai. Ye table-answer hi interview me score karta hai.
 
 ---
 

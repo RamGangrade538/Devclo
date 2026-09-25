@@ -1,6 +1,6 @@
 # Deep Dive: Containers vs VMs — Dibba vs Poora Computer
 
-> **Kaha ka hai:** Day 15 (Docker) ka gahra version. Ye fundamental concept hai — agar ye clear hai to Docker, K8s, serverless sab asaan.
+> **Standalone deep dive:** Ye fundamental concept hai — agar ye clear hai to Docker, K8s, serverless sab asaan.
 
 ---
 

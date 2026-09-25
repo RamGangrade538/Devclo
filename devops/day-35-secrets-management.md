@@ -10,6 +10,61 @@ Day 20 me K8s Secrets the (base64 — weak). Day 34 me leak hote dekhe. Is din: 
 3. **SOPS + age/KMS** — encrypted files in Git (GitOps-friendly)
 4. **External Secrets Operator + CSI Driver** — K8s pods ko secrets auto-sync
 
+### Secrets lifecycle — create se revoke tak
+
+Secret ka full journey: **create → store (central) → inject (runtime, not build) → rotate → revoke → audit**. Har step ka rule simple hai: create **least privilege** ke saath (sirf authorized log); value **kabhi log/commit/image me nahi**; inject app runtime pe env/file ke roop me; rotate = naya version + purana expire; revoke = turant invalid; audit = kaun, kab, kahan padha (access logs). Sabse weak link aksar **inject** step hota hai — `.env` file ya hardcoded variable — isliye is din ka poora architecture isi ek step ko production-grade banata hai.
+
+Lifecycle ke har step pe ek sawal poochho:
+- **Create** — kitne log secret bana sakte hain? (least privilege)
+- **Inject** — secret value kahan milti hai? (runtime, not build/image)
+- **Rotate** — naya version kon chala ke purana expire karta hai?
+- **Revoke/audit** — kaise invalid + kaunne kab padha (logs)?
+
+### Char options — kab kaunsa
+
+| Option | Best for | Trade-off |
+|--------|----------|-----------|
+| Azure Key Vault / AWS SM | Cloud-native teams | Managed + RBAC ready, thoda vendor lock-in |
+| HashiCorp Vault | Multi-cloud, dynamic secrets | Powerful, par operate khud karna |
+| SOPS + age | GitOps file secrets | Simple, no server — rotation semi-manual |
+| ESO/CSI Driver | K8s pod delivery | Kube-native sync — store phir bhi chahiye |
+
+Golden pattern: **store ek chahiye, delivery mechanism alag ho sakta hai** — Key Vault + ESO ek hi system me combos common hain.
+
+### Vault ki khaas baat — dynamic secrets aur transit
+
+KV store to kahin bhi milta hai (Key Vault bhi KV hai) — Vault ke 2 edge features: **dynamic secrets** (DB creds on-demand, TTL 1 ghanta — leak ho bhi gaya to expiry ke baad bekaar) aur **transit engine** (app ko encryption API, keys khud Vault me rehti hain). Bonus: versioning + audit log + policy (Vault ka apna RBAC system). Gotcha: Vault self-hosted karo to **unseal + HA + backup** ka bojh aap pe — chhoti team ke liye managed KV (Key Vault) zyada practical.
+
+Vault ke 3 engines important:
+- **KV v2** — versioned static secrets with audit trail
+- **Database engine** — on-demand DB creds, TTL + rolling
+- **Transit** — data encryption API (keys Vault me, ciphertext app me)
+
+### SOPS — Git me encrypted secret files
+
+Flow: `age-keygen` (private key CI/cluster ke secrets me, repo me kabhi nahi) → `sops -e secrets.yaml > secrets.enc.yaml` → commit **encrypted file hi**. File ka structure plain rehta hai, sirf **keys/values encrypted** — isliye diff review bhi ho jata hai (kya badla dekh sakte ho). GitOps ke saath perfect: ArgoCD sync pe decrypt ho ke apply. Gotcha: file add/rename pe careful raho (`.sops.yaml` rules), aur **key rotation** ki process pehle se socho. Compare: Sealed Secrets = per-secret CR; SOPS = per-file — dono valid, choice context pe.
+
+SOPS ke 3 golden rules:
+- **Private key kabhi repo me nahi** — CI/secrets manager me, decryption sirf runtime
+- **`.sops.yaml`** me file-level rules — kuan aur kaise encrypt hoga
+- Rotation: naya age key banao → file re-encrypt → commit, server pe dual-key period
+
+### Kubernetes delivery — ESO aur CSI Driver
+
+Day-20 wala `kubectl apply` Secret **base64 encoding hai, encryption nahi** — koi bhi with RBAC plaintext padh sakta hai, aur Git me commit ho gaya to risk permanent hai. Sahi pattern: **External Secrets Operator** (ESO) external store se padh ke **native Secret object** bana de (with `refreshInterval` auto-renew) — pods ko store ka pata hi nahi. Ya **Secrets Store CSI Driver**: secret direct mount, CR object me store hi nahi hota. Auth without static creds: **Workload Identity / ServiceAccount + OIDC** — wahi secret-zero ka answer hai.
+
+ESO ka k8s flow ek line me: `SecretStore` (provider + auth) → `ExternalSecret` (remote key ka mapping) → refresh interval pe native Secret update. SecretStore environment-scoped rakho (`prod` ka store prod namespace tak) — secret blast radius chhota rah.
+
+### Rotation aur secret zero — bootstrapping ka sawal
+
+Rotation do tareeke se: 1) app **runtime pe re-read** kare (Vault agent, App Configuration refresh, ya webhook), 2) **short-TTL dynamic creds** jinki renewal hi rotation. Dono me point same — `restart` ke bina secret badle. **Secret zero** sawal: pod ko pehle secret lene ke liye creds chahiye — ye pehli credential kahan se? Answer: **cryptographic identity** (OIDC/JWT, Azure Managed Identity, ServiceAccount tokens) — koi long-lived "master password" nahi. Golden line: **"the first secret should not be a secret"** — yani identity-based ho, koi static key se nahi.
+
+### Gotchas aur interview angle
+
+Common blunders: base64 ko encryption samajhna; private repo me `.env` commit ("private hai to safe hai" — galat, git history permanent hai); image me `ENV` secret (docker history expose hota hai); rotation sirf documentation me (planning me kiya hua kabhi execute hi nahi hota). Interview starter: **"secret leak ho gaya, kya karoge?"** → pehle revoke/rotate (risk band), phir leak trace + root cause, phir process fix (gitleaks pre-commit + push protection + central store). Frame: prevention > detection > response.
+
+Ek quick audit question khud se poochho: "mera DB password agar GitHub pe aa jaye to chaar log kitne jagah use karte hain?" — agar jawab "12 jagah" hai to central store + role-based access ka fayda turant dikh jayega. Secrets central hone se rotation ka ek hi true source rehta hai.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] Secrets lifecycle: create, inject, rotate, revoke, audit

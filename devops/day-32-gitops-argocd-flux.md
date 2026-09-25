@@ -6,6 +6,66 @@
 
 Ab k8s pe deploy hone laga, but abhi bhi `kubectl apply -f` manual hai → Git se truth sync nahi rahta. **GitOps** ise reverse karta hai: operator (ArgoCD/Flux) **pull** karta hai Git repo se aur cluster ko desired state pe le jata hai. Deploy = merge a PR. Rollback = revert. Audit = Git history.
 
+### GitOps kya hai — Git hi source of truth
+
+Traditional tarike me `kubectl apply` karke chala gaya — cluster me kya hai, kaunse version ka pod, koi bhi bata nahi sakta. GitOps me **desired state = Git repo**, aur ek operator (ArgoCD/Flux) cluster ko uske saath continuously **sync** karta hai. Fayde: **audit** (`git log` = kya, kaun, kab), **rollback = `git revert`**, **review = PR merge**, **disaster recovery** (repo se sab wapas). Do principles hamesha: sab **declarative** (YAML me, imperative commands nahi) + **automated sync** (insaan ka haath beech me nahi). Line yaad rakho: "If it's not in Git, it doesn't exist."
+
+4 promises yaad rakho:
+- **Repeatable** — koi bhi repo clone kar ke cluster bana do (local vs prod diff 1 config)
+- **Peer-reviewable** — PR me koi bhi change dikhta hai, merge se pehle
+- **Revertible** — bug aaya → `git revert` → wapas (no config archaeology)
+- **Auditable forever** — `git log` = compliance/who-did-what ka answer
+
+### Push vs Pull — kyun pull safer hai
+
+Push model me CI ke paas cluster ka `kubectl` credential hota hai — CI compromise hua to cluster khatam. Pull model me **cluster ke andar ka operator** Git ko padhta hai; cluster ke paas sirf **read-only Git access** rehta hai, cluster never writes to Git. Effect: attacker cluster bhi le le to Git change nahi kar sakta — Git safe = recovery possible. Isliye ArgoCD/Flux **pull** karte hain — ye GitOps ka security core hai.
+
+```
+Push:   CI --kubectl--> Cluster    (CI token can modify cluster)
+Pull:   Operator --read--> Git     (cluster never writes Git)
+```
+
+### ArgoCD ka anatomy — Project, Application, SyncPolicy
+
+Teen CRs ka division yaad rakho: **Project** = scoping/RBAC (kaunsa app kis repo ya namespace me chal sakta hai), **Application** = kya kahan (source repo+path → destination cluster+namespace), **SyncPolicy** = kab sync (`automated` + `prune` + `selfHeal`). UI pe app ka diff + health dikhta hai; CLI se `argocd app diff/sync`. Gotcha: `prune: true` risky ho sakta hai agar path galat ho — pehle bina prune ke test karo, phir enable.
+
+Ek cheat-sheet:
+- **Project** = kya allowed (repo whitelist, destination namespaces, cluster resources)
+- **Application** = source (repoURL+path+branch) → destination (server+namespace)
+- **SyncPolicy** = `automated` + `prune` + `selfHeal` (teeno on = full GitOps)
+
+### Flux — same idea, alag CRs
+
+Flux **k8s-native components** se bana hai: **GitRepository** (source define karo) + **Kustomization** (kaunsa path, kitne interval pe apply) + Helm ke liye `HelmRepository`/`HelmRelease`. Argo ek bada app with UI hai, Flux modular toolkit-style controllers hai — dono me philosophy same: **poll Git → diff → apply → report status**. Kab kaunsa: app-by-app tracking + UI chahiye → ArgoCD; pure CR-centric, Git-managed setup chahiye → Flux.
+
+### Self-heal, prune aur rollback — Git hi truth
+
+Teen superpowers: **selfHeal** — kisi ne manually `kubectl edit` kar diya? operator wapas desired state pe le aata hai (drift detect + correct). **prune** — Git se manifest hata diya → cluster me resource bhi delete. **rollback** — `git revert` karo, operator khud cluster wapas le aayega. Yahi "cattle" mentality hai: cluster pe haath mat maro, **ya to Git ko reality match karo, ya Git badlo**. Interview sawal: "manual hotfix laga rakha hai, kya karoge?" → answer: emergency PR + revert drifts, kabhi direct `kubectl apply` nahi.
+
+Drift ke 3 sources:
+- **Manual `kubectl edit`** → selfHeal wapas le aata hai (with alert)
+- **Operator ne apne aap badla** (HPA/sidecar) → Argo me diff visible, policy decide kare
+- **Git me kisi ne badla** → auto-sync runs, rollout hota hai — yahi to desired hai
+
+### Secrets GitOps me — Sealed Secrets aur SOPS
+
+Problem: declarative sab Git me chahiye, par secret plaintext commit nahi kar sakte. Do tareeke: **Sealed Secrets** — public key se `kubeseal` encrypted YAML commit karo, sirf cluster ka controller decrypt karta hai. **SOPS + age** — file ka structure plain, sirf values encrypt rahti hain (diff review easy), sync pe decrypt. Common rule: **encryption key kabhi repo me nahi** (age private key CI/cluster secret me). Ye combo GitOps + security ko compatible banata hai — Day 35 iska deep dive hai.
+
+### Multi-env — kustomize overlays se targeting
+
+Ek base + overlays: `base/` me common manifests, `overlays/dev|prod/` me sirf differences (`replicas`, image tag, resources). `kustomize build overlays/prod` = final YAML. Helm ka version: ek chart + per-env `values-file.yaml`. Dono ka goal same — **1 source of truth, N flavors**, manifests copy-paste mat karo. ArgoCD me har env ka apna Application hota hai (`path: apps/myapp/overlays/prod`) — environment targeting isi se hota hai.
+
+Environment strategy — teen cheezein:
+- **dev**: latest branch, koi gate nahi, small replicas (cheap)
+- **staging**: main branch + temp data, prod ke jaisa manifests
+- **prod**: main + image pin (SHA), approval/health gate, autoscale on
+
+Diff: overlays me keval env-specific cheezein (replicas, resources, image) — base me kabhi env logic nahi.
+
+### Interview angle — GitOps ke 4 principles
+
+Standard frame: **1) declarative desired state in Git, 2) automated apply by software agent, 3) continuous reconciliation (diff + fix), 4) feedback/alerts on drift**. Uske baad push-vs-pull, rollback story, aur secrets handling — ye teen follow-ups hamesha aate hain. Ek closing line perfect: **"Deploy = merge a PR, Rollback = revert a commit, Audit = git log"** — ye 3 words ka frame interview me bawal hai.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] GitOps principles: declarative + Git + automated sync + feedback

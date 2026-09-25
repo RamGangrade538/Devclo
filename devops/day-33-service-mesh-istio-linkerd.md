@@ -14,6 +14,74 @@
 
 Istio = feature-rich (Envoy), Linkerd = lightweight (Rust data plane, easiest). Ingress/Egress bhi mesh se.
 
+### Service mesh kyun — retry har service me mat likho
+
+Microservices badhne ke saath har service me **retry, timeout, TLS, logging** likhna padta hai — 15 services x 4 concerns = 60 jagah same code, same bug. **Service mesh** ye sab ek **network layer** pe le aata hai: app sirf business logic likhe, networking policies mesh enforce kare. Kab use karo: service count badh gaya, mTLS chahiye, canary chahiye — 2-3 services pe manual bhi ho jata hai; mesh justified hai jab **consistency + scale ka pressure** ho. Analogy: har ghar ka apna guard nahi — society ka ek trained guard hi sab doors pe lagta hai.
+
+### Sidecar proxy pattern — har pod ka bodyguard
+
+**Data plane** = har pod ke saath ek **Envoy sidecar** container. Saara incoming/outgoing traffic proxy ke through jata hai (iptables redirect) — app ko lagta hai seedha call ho rahi hai, par proxy beech me sab pakad leta hai: route, encrypt, count, log. Fayda: **language-agnostic** (Java, Python, Go — sab ko same treat). Gotcha: sidecar extra resource khaata hai (CPU/memory requests dena padta hai), aur injection ke baad pod restart hota hai — production me `PodDisruptionBudget` ke saath rollout karo.
+
+Sidecar inject hone ke baad traffic ka flow samjho:
+```
+Client app --> Envoy sidecar --> mTLS/route --> Envoy sidecar --> server app
+        (app client ko poora path nahi dikhta — mesh manage karta hai)
+```
+Iskey liye app code `localhost` jaise calls karta chalta hai — par traffic actually proxy se nikla — ye "transparent proxy" pattern hai.
+
+### Control plane vs data plane — istiod aur Envoy
+
+Mesh ke do hisse: **data plane** = Envoy proxies jo actual packets forward karte hain; **control plane** = `istiod` jo proxies ko **certificates + config** (VirtualService, policies) distribute karta hai — out-of-band. Proxy config ko **pull** karta hai, isliye istiod down ho to existing traffic chill chalta rehta hai (data plane independent). Ye separation interview me common sawal hai: "traffic kaun route karta hai? Envoy. Envoy ko route kaun batata hai? istiod via xDS protocol."
+
+### Traffic management — VirtualService, DestinationRule, Gateway
+
+Teen CRs ka division yaad rakho: **Gateway** = ingress darwaza (kaunse host/port bahar se dikhte hain); **VirtualService** = routing rules (match → route, weight, headers, retries/timeouts); **DestinationRule** = destination ki policy (subsets jaise v1/v2, connection pool, mTLS mode). Sabse bada confusion: VS batata hai **"kahan bhejo"**, DR batata hai **"wahan pe kya policy"** — dono milkar canary, AB, aur circuit-breaker sab possible banate hain.
+
+### Canary aur weighted routing — zero downtime release
+
+Classic flow: naya version `v2` deploy karo par sirf **10% traffic** do; error/latency monitor; sahi dikhe to 100% — `VirtualService` me `weight: 90/10` + `DestinationRule` me `subsets` label match. Header-based match bhi on hai: sirf Chrome users ko pehle v2 (pre-validation). Fail pe weight 0 — **seconds me rollback, image rebuild nahi**. Gotcha: mesh canary **traffic-level** hai; app ke andar feature flags **logic-level** — dono alag tools hain, confuse mat karo.
+
+```yaml
+# VirtualService — 90/10 canary
+- route:
+  - destination: {host: myapp, subset: v1}
+    weight: 90
+  - destination: {host: myapp, subset: v2}
+    weight: 10
+```
+
+Canary ka poora loop bata sakoge — ye interview ka favourite topic hai:
+```
+deploy v2 (subset) -> VS weight 90/10 -> monitor (Kiali/Prom)
+   -> stable: weight 0/100 -> v1 delete
+   -> fail: weight 100/0 -> v1 wapas (image rebuild nahi)
+```
+Timeouts/retries bhi `VirtualService` me `retries` + `timeout` fields se set hote hain — app code change nahi.
+
+### mTLS aur zero-trust — mesh ka security layer
+
+Mesh install hote hi **saara east-west traffic encrypt** ho jata hai (`PeerAuthentication` mode STRICT) — matlab pod-to-pod communication ab plaintext nahi; spoofing/miTM hat gaya. Upar **AuthorizationPolicy** se L7 allow/deny: "sirf frontend → payments service"; safest pattern = **default deny-all** phir explicit allow (zero-trust). Note: mTLS **service identity** deta hai (ServiceAccount se linked), IP-based trust nahi — pod change hone pe bhi policy valid rehti hai. Ingress pe TLS termination gateway level pe hota hai.
+
+### Observability — bina code change ke
+
+Har request ke liye **golden metrics** (QPS, error rate, latency) proxy se hi milti hain — app me instrumentation add karne ki zaroorat nahi. **Kiali** = service graph + health (red edges = errors), **Jaeger/Tempo** = distributed traces (Envoy ke spans), **Prometheus** = metrics scrape. Getting-started sabse easy: Kiali graph se turant dikhta hai kaun kis se baat kar raha hai aur kahan slow hai — yahi mesh ka asli ROI hai, jaane se pehle system samajhna.
+
+Mesh observability vs app observability ka fark:
+- **App metrics** — business events (orders, cart) — app instrumentation se
+- **Mesh metrics** — network health (routing, retries, TLS) — proxy se hi
+- Distributed traces dono ko jorte hain (span chain) — distributed systems me must
+
+### Istio vs Linkerd — kab kaunsa
+
+**Linkerd**: install minutes me (Rust data plane — halka), golden metrics built-in, kam knobs — pehli baar mesh wali team ke liye best. **Istio**: feature-rich (advanced traffic mangling, extensibility, multi-cluster), par complexity aur Envoy ka resource overhead zyada — bade enterprises ke liye. Choose on **requirement + team skill**, fashion se nahi. Interview ke liye 2 one-liners: Linkerd = simplicity, Istio = power.
+
+Quick selection:
+- **Pehli baar mesh, chhoti team** → Linkerd (install + golden metric built-in, mTLS by default)
+- **Advanced traffic mangling (header/weight/mirroring), multi-cluster** → Istio
+- **Confusion ho to** → dono ko demo/cluster pe try karke decide karo
+
+Common gotcha sabka: proxy ka 5-10% latency overhead aur ek nayi layer jise team ko samajhna hai — isliye **phase-wise rollout** karo (pehle sirf critical paths), poore mesh me ek din me mat ghusedo.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] Sidecar proxy pattern + Envoy

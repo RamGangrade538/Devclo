@@ -1,6 +1,6 @@
 # Deep Dive: TLS, Certificates & PKI — HTTPS Ke Andar Ka Jadoo
 
-> **Kaha ka hai:** Day 5 (networking) + Day 26/49 (security). Internet pe **encrypted kya se guarantee hoti** — TLS certificate + PKI se. mTLS (Istio), Let's Encrypt, kubectl certificate, sb. Ye concept bina samjhe senior DevOps nahi bante.
+> **Standalone deep dive:** Internet pe **encrypted kya se guarantee hoti** — TLS certificate + PKI se. mTLS (Istio), Let's Encrypt, kubectl certificate, sb. Ye concept bina samjhe senior DevOps nahi bante.
 
 ---
 

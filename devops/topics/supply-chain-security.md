@@ -1,6 +1,6 @@
 # Deep Dive: Supply Chain & Artifact Security — SBOM, Signing, SLSA, Policy
 
-> **Kaha ka hai:** Day 48 ka gahra version. Attack surface extends beyond your code: base images, dependencies, CI runners, registries. Provenance + signing + policy earn your artifacts a verifiable identity.
+> **Standalone deep dive:** Attack surface extends beyond your code: base images, dependencies, CI runners, registries. Provenance + signing + policy earn your artifacts a verifiable identity.
 
 ---
 

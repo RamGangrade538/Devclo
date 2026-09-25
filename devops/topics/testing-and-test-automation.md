@@ -1,6 +1,6 @@
 # Deep Dive: Testing & Test Automation — CI Me Gate, Cadence Me Confident
 
-> **Kaha ka hai:** Day 8 (CI/CD) + Day 9 (GitHub Actions) + Day 14 (capstone). Jo engineer **tests ka tree** banata hai aur CI me gate laga pata hai, wahi production deploy bharosa se karta hai. Ye topic 'itna jaldi, etni confidence' wali chij hai.
+> **Standalone deep dive:** Jo engineer **tests ka tree** banata hai aur CI me gate laga pata hai, wahi production deploy bharosa se karta hai. Ye topic 'itna jaldi, etni confidence' wali chij hai.
 
 ---
 

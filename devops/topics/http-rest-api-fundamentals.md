@@ -1,6 +1,6 @@
 # Deep Dive: HTTP & REST APIs — Web Ki Andar Ki Baat
 
-> **Kaha ka hai:** Day 5 (networking) + Day 46 (API gateways) ka foundation. Har tool (curl, browser, kubectl, cloud APIs) HTTP use karta hai — **ye samjhe bina DevOps nahi**.
+> **Standalone deep dive:** Har tool (curl, browser, kubectl, cloud APIs) HTTP use karta hai — **ye samjhe bina DevOps nahi**.
 
 ---
 

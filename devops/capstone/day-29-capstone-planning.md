@@ -6,6 +6,77 @@
 
 **DeployTrack** - ek complete DevOps project jisme aap 30 din ka sab kuch combine karoge: Flask backend, Docker, K8s, Terraform, monitoring, logging, security, aur CI/CD. Aaj **planning** karenge.
 
+### Capstone kyun — 30 din ka sab kuch ek project me
+
+Alag-alag labs alag-alag theek lagte hain, par asli test tab hota hai jab **ek hi project** me sab ko saath jodna ho. Capstone isliye hai kyunki industry me bhi yahi hota hai: ek application, ek repo, ek pipeline — jisme **Dockerfile** se lekar **Terraform** tak sab ek dusre pe depend karte hain. Ek cheez badal do (jaise port ya env var) to compose file, K8s Service, ingress — sab ko saath adjust karna padta hai. Yahi **integration muscle** hai jo interview me aur real job me dono me dikhta hai.
+
+Ek baar me 5 layers decide hote hain — code, build, run, infra, observe:
+- **Code** — Flask + React + Celery (kya likhna hai)
+- **Build** — Dockerfiles + GHCR tags (image kaise banegi)
+- **Run** — compose locally + K8s on cloud (kahan chalega)
+- **Infra** — Terraform se VNet/AKS/Postgres (base kaise bana)
+- **Observe** — Prometheus/Grafana (deploy ke baad kaise dekho)
+
+### Architecture pehle — boxes aur arrows ka game
+
+Planning ka sabse pehla kaam hai **architecture draw karna** — kaunse components hain, kaun kis se baat karta hai, data kahan store hota hai, entry point kya hai. Golden rule: **code likhne se pehle diagram banao**, warna baad me refactor bahut mehnga padta hai. DeployTrack me 4 core boxes hain — **frontend** (React UI), **backend API** (Flask brain), **worker** (Celery — background jobs), aur **data layer** (PostgreSQL + Redis). Nginx bahar ka single darwaza hai; Prometheus/Grafana andar ki nigrani. Interview me jab "design a deployment tracker" aaye, to yahi flow arrows ke saath bolna shuru karo.
+
+| Layer | Kya karega | Kyun chahiye |
+|-------|-----------|--------------|
+| Frontend | Status UI dikhaye | User ko live view chahiye |
+| API | CRUD + business logic | Sabka central brain |
+| Worker | Long jobs (notify, sync) | HTTP response fast rahe |
+| DB + Cache | State + queue | Durable data + fast hand-off |
+
+### Monolith vs microservices — line kahan khichni hai
+
+DeployTrack **chhota microservice-style** app hai: frontend, API, worker alag containers hain, par itna bhi nahi ki har service ka apna repo ho. Ye learning ke liye **sahi balance** hai — bada monolith me Docker/K8s ka maza nahi aata, aur 20 microservices me pehle hi overload ho jata hai. Rule of thumb: jab ek cheez ka **independent scale** chahiye (worker pe load alag) ya **alag lifecycle** ho (frontend static assets, backend dynamic API), tabhi alag karo. Baaki ko simple rakho — complexity khud justified honi chahiye.
+
+Decision shortcut:
+- **Monolith** — ek process, deploy/scale saath-saath: chhoti team, low load ke liye
+- **Microservices** — alag deploy/scale, par network + versioning ka complexity: bade teams
+- **Yahan** — 3 containers (frontend/backend/worker) + shared DB: bounded complexity
+
+Ye choice bolna hi interview me design-sense dikhata hai — "kyun 3 services, 15 nahi?" ka jawab ready rakho.
+
+### Directory structure — repo ka blueprint
+
+Repo ka layout hi team ki soch batata hai. Rules: **config alag code se** (`terraform/`, `k8s/`, `monitoring/` apne folders me), `scripts/` me jo bhi bash chalta hai, `.github/workflows/` me pipelines, aur har service apne folder me Dockerfile ke saath. Ek aur zaroori cheez — **.gitignore pehle hi sahi likho** (`.env`, `*.tfstate`, `node_modules/`), warna pehla commit hi secrets aur faltu files le jaata hai. Clean layout se naya member `ls` karke samajh jata hai ki kahan kya hai — onboarding ka aadha kaam yahin khatam.
+
+```bash
+deploytrack/
+├── backend/     # Flask app + tests + Dockerfile
+├── frontend/    # React UI + Dockerfile
+├── terraform/   # infra as code (AKS, VNet, DB)
+├── k8s/         # manifests: deploy, svc, ingress
+└── scripts/     # deploy, rollback, health-check
+```
+
+### Planning vs coding — DevOps ka golden rule
+
+Interviews me yahi farak dikhta hai ki banda junior hai ya ready-for-prod: juniors turant code likhna shuru karte hain, seniors pehle **requirements, constraints aur failure modes** sochte hain. Aaj ka din isliye planning ka hai: pehle architecture + directory + git init + test skeleton, phir kal poora implementation. Planning me hi decide ho jaana chahiye — **kaunse endpoints**, **secrets kahan jayenge**, **rollback kaise hoga**, aur **Azure ka cost idea** (har resource bill deta hai — cleanup plan bhi). Ek ghante ki planning implementation me 10 ghante bachati hai.
+
+Planning sheet decide karti hai:
+- **API contract** pehle — endpoints, request/response shape (client/server ka agreement)
+- **Secrets** kaunse store se — compose me env, K8s me Secret ya Key Vault
+- **K8s shape** — Deployment + Service + Ingress ka pehla draft
+- **Rollback + health check** points — fail hone pe kaise detect + wapas
+- **Azure resources checklist + estimated cost** (cleanup ke saath ek hi jagah)
+
+### Local dev — docker-compose pehle, cloud baad me
+
+Production se pehle sab kuch **local pe verify** karo — `docker-compose up` se ek command me Flask + Postgres + Redis + Nginx chal jate hain, bina kisi ka laptop setup kharab kiye. Compose ka bada fayda: **same interfaces** production jaise (env vars `DATABASE_URL`, `REDIS_URL`) — isliye code me `localhost` hardcode nahi hota. Gotcha: compose ka `depends_on` sirf start order deta hai, service ready hone ka wait nahi — app side pe retry logic rakho. Local green dikhe tabhi Azure/AKS pe jaana safe hai.
+
+### Interview angle — planning wale sawal
+
+Common asks: "DeployTrack kaise design karoge?", "frontend aur API beech me kya aayega?", "state kahan rakhoge?", "rollback plan kya hai?". Pattern yaad rakho: **requirements → components → data flow → failure handling → cost/security**. 8-word frame: nginx = entry point, Flask = logic, Celery = async, Postgres = source of truth, Redis = queue/cache, K8s = run, Terraform = infra, GitHub Actions = glue. Ye bolna hi answer ka skeleton de deta hai — details fir usi pe layer karo.
+
+Interview prep notes:
+- "Project banao" wale sawal pe **pehle diagram, phir detail** — order hi senior behavior hai
+- **"Kyun 3 services, 15 nahi?"** ka jawab ready rakho (independent scale + alag lifecycle)
+- Rollback, cost, security teeno jagah mention karo — bina puchhe bolna value-add hai
+- Whiteboard pe boxes+arrows draw karne ki practice rakho — likhne ki jagah batao
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] DeployTrack architecture samajhna (frontend + backend + worker + database)

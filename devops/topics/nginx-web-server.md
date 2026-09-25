@@ -1,6 +1,6 @@
 # Deep Dive: Nginx — Reverse Proxy, Web Server Aur Ingress
 
-> **Kaha ka hai:** Day 16 (compose) + Day 21 (K8s ingress) + Day 13 (admin) ka asli engine. Nginx duniya ki sabse zyada used web server/reverse proxy hai — har cloud, har ingress, har LB stack me. Ye topic usse asli-pro power tak le jata hai.
+> **Standalone deep dive:** Nginx duniya ki sabse zyada used web server/reverse proxy hai — har cloud, har ingress, har LB stack me. Ye topic usse asli-pro power tak le jata hai.
 
 ---
 

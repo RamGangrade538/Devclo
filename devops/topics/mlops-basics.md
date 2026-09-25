@@ -1,6 +1,6 @@
 # Deep Dive: MLOps — Model Lifecycle, MLflow, Serving, Drift, LLMOps
 
-> **Kaha ka hai:** Day 44 ka gahra version. ML = just another software artifact with extra stages (data versioning, training, evaluation, serving, drift). Reproducibility + automation + monitoring = MLOps.
+> **Standalone deep dive:** ML = just another software artifact with extra stages (data versioning, training, evaluation, serving, drift). Reproducibility + automation + monitoring = MLOps.
 
 ---
 

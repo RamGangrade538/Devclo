@@ -1,6 +1,6 @@
 # Deep Dive: DevSecOps — Shift-Left Security (SAST, DAST, SCA, SBOM, Secrets, Supply Chain)
 
-> **Kaha ka hai:** Day 17, 26 ka gahra version. DevSecOps = security ko **development ke har stage** me le ana — pipeline gate banake, OS/mainframe alag nahi. "Security sabka kaam" — shift-left philosophy.
+> **Standalone deep dive:** DevSecOps = security ko **development ke har stage** me le ana — pipeline gate banake, OS/mainframe alag nahi. "Security sabka kaam" — shift-left philosophy.
 
 ---
 

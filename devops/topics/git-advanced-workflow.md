@@ -1,6 +1,6 @@
 # Deep Dive: Git Advanced — Branching, Rebase, Reflog, Bisect & Production Git
 
-> **Kaha ka hai:** Day 6 (basics) ka next level. 5-saal-experience engineer ki pehchan = woh git se kabhi **data nahi khota** aur conflict me fasa nahi rehta. Team workflows bhi yahin se decide hote hain.
+> **Standalone deep dive:** 5-saal-experience engineer ki pehchan = woh git se kabhi **data nahi khota** aur conflict me fasa nahi rehta. Team workflows bhi yahin se decide hote hain.
 
 ---
 

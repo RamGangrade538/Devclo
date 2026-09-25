@@ -1,6 +1,6 @@
 # Deep Dive: Chaos Engineering — Litmus, Chaos Mesh, GameDays, Fault Injection
 
-> **Kaha ka hai:** Day 40 ka gahra version. Purposefully break things (in controlled scope) to build confidence. "If it survives chaos, it can survive production."
+> **Standalone deep dive:** Purposefully break things (in controlled scope) to build confidence. "If it survives chaos, it can survive production."
 
 ---
 

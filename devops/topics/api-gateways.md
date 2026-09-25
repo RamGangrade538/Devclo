@@ -1,6 +1,6 @@
 # Deep Dive: API Gateways & Edge — APIM, Front Door, Rate Limits, WAF, Auth
 
-> **Kaha ka hai:** Day 46 ka gahra version. The gateway is the front door of your whole backend: OAuth, throttling, caching, versioning, analytics — plus WAF + CDN in Front Door. Design the edge before clients arrive.
+> **Standalone deep dive:** The gateway is the front door of your whole backend: OAuth, throttling, caching, versioning, analytics — plus WAF + CDN in Front Door. Design the edge before clients arrive.
 
 ---
 

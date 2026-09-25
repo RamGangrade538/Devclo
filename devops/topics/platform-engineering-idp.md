@@ -1,6 +1,6 @@
 # Deep Dive: Platform Engineering & IDPs — Backstage, Golden Paths, Developer Portals
 
-> **Kaha ka hai:** Day 38 ka gahra version. Platform = product for developers: self-service, repeatable, Golden Path templates → faster time-to-first-deploy, less tribal knowledge.
+> **Standalone deep dive:** Platform = product for developers: self-service, repeatable, Golden Path templates → faster time-to-first-deploy, less tribal knowledge.
 
 ---
 

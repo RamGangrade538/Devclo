@@ -1,6 +1,6 @@
 # Deep Dive: Kubernetes Architecture — Control Plane & Scheduling
 
-> **Kaha ka hai:** Day 18-21 ka gahra version. K8s me koi bhi interview QA is architecture ke bina nahi chalta.
+> **Standalone deep dive:** K8s me koi bhi interview QA is architecture ke bina nahi chalta.
 
 ---
 

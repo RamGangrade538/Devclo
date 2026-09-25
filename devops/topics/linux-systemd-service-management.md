@@ -1,6 +1,6 @@
 # Deep Dive: systemd & Service Management — Java App Ko 24×7 Kaise Rakhte Hain
 
-> **Kaha ka hai:** Day 3 (processes) + Day 7 (server setup) + Day 13 (automation) ka production wala version. Production me **rarely** `./app &` chalti hai — sab kuch **systemd service** hota hai. Ye ek must-know skill hai har interview me.
+> **Standalone deep dive:** Production me **rarely** `./app &` chalti hai — sab kuch **systemd service** hota hai. Ye ek must-know skill hai har interview me.
 
 ---
 

@@ -6,6 +6,80 @@
 
 DeployTrack ka **complete implementation** - CI/CD pipelines, Kubernetes manifests, Terraform infra, monitoring, deployment scripts, sab kuch ek saath. Yahan se aap ek real-world DevOps engineer ban rahe ho.
 
+### Implementation ka matlab — components ko jodna
+
+Kal tak sab alag-alag tha: pipeline alag, manifests alag, infra alag. Aaj wo sab **ek connected system** bante hain — jahan `git push` se lekar production pod health check tak ka rasta automatic hai. Asli DevOps engineering yahi hai: alag tools nahi, **tools ke beech ke connections** — image kahan build hua, kaunse tag se deploy hua, wo tag manifest me kaise pahuncha, aur fail hone pe wapas kaise jaoge. Isliye is din ka focus "type karo aur chalao" nahi, **end-to-end flow verify karna** hai.
+
+Har component ka role interview-answer me aise bolna:
+- **CI** — code se image tak: lint, test, scan, build, push
+- **CD** — image se pod tak: SHA tag, deploy, health check
+- **IaC** — pod se infra tak: cluster, VNet, DB Terraform se
+- **Observability** — serve hone ke baad: metrics, logs, alerts
+
+Yeh 4-chapter ka flow khud ek answer hai — "pure stack kaise chalta hai" ke liye.
+
+### CI/CD pipeline — push se production tak ka rasta
+
+Pipeline ka frame: **build fast fail, deploy slow fail**. Pehle `ci.yml` — lint + test turant chale (minutes me), phir build + `trivy` scan, phir GHCR pe push. Deploy alag workflow me: staging auto, production me **manual approval** (GitHub environment protection). Do rules hamesha: 1) **immutable tags** — image pe `latest` kabhi mat lagao, commit SHA use karo, warna rollback ka pata nahi chalta; 2) **har stage ka exit code** matter karta hai — non-zero = pipeline turant ruk jati hai.
+
+| Stage | Tool | Fail hone pe |
+|-------|------|--------------|
+| Lint/Test | flake8, pytest | build block |
+| Image scan | Trivy HIGH+CRITICAL | release block |
+| Push | GHCR + SHA tag | aage mat badho |
+| Deploy staging | deploy.sh + rollout status | alert + ruk |
+| Prod approval | environment gate | insaan decide |
+
+Pipeline me do cheezein aur mat bhoolo: **caching** (deps layer reuse — CI speed 2x tak badh jati hai) aur **artifacts upload** (step-to-step state) — bina inke har run naye sir se chalta hai.
+
+### Declarative everything — manifests ka fayda
+
+`kubectl apply -f` YAML pe chalta hai — matlab cluster ka **desired state file me likha hota hai**, command me nahi. Iska matlab: version control me review hota hai, diff me pata chalta hai kya badla, aur delete+recreate se dar nahi lagta (idempotent). Manifest likhte waqt 4 cheezein hamesha: **resource requests/limits** (warna node pe dosre pods ko crush kar dete ho), **readiness vs liveness probe** (alag cheezein hain — readiness = traffic bhejo, liveness = restart maro), **labels/selectors** ka match, aur **env = ConfigMap vs Secret** ka sahi split. Ye chhoti cheezein hi production me CrashLoopBackOff se bachati hain.
+
+Manifest hygiene checklist (har Deployment me):
+- `resources.requests/limits` — node par predictable scheduling
+- `readinessProbe` + `livenessProbe` — traffic aur restart ka alag control
+- `imagePullPolicy` — dev me `Always`, prod me `IfNotPresent` (ya SHA pin)
+- Labels + selector ka exact match — warna Service galat pods pe jaati hai
+
+Isko "manifest hygiene" bol ke interview me apni team practice dikhao.
+
+### Infrastructure as Code — Terraform ka role
+
+Cluster, VNet, database — ye sab `az` CLI se bhi banta hai par **CLI commands history me rehte hain, state nahi**. Terraform **state file** rakhta hai ki kya bana hai, isliye `plan` dikhata hai "kya badlega" apply se pehle — review ka mauka milta hai. Rules: **remote backend** (tfstate kabhi git me nahi), **modules** se code reuse (`./modules/aks`), aur **tags** pehle se lagao (cost track). Order bhi yaad rakho: infra pehle (`terraform apply`), phir app manifests — pipeline me yahi sequencing honi chahiye.
+
+Terraform ke 3 golden rules:
+1. **State = shared truth** — remote backend + lock, taaki ek hi apply ek baar chale
+2. **Plan review = PR** — har change me `terraform plan` dikhao sabko review ke liye
+3. **Cattle, not pets** — resource ko haath se adjust kabhi nahi; delete/recreate sahi
+
+### Deploy, verify, rollback — teenon ek hi unit hain
+
+Deploy sirf tab complete nahi jab pod Running dikhe — **health check pass** hone pe complete hai. Isliye `deploy.sh` me: `kubectl set image` → `rollout status --timeout` → `curl /api/health` → fail = `rollout undo`. Ye **fail-fast loop** asli production skill hai. Rollback bhi automation ka part hai, manual panic nahi: `rollout history` se versions dekho, `rollout undo` se wapas. Interview me yahi bolo: "deploy ke baad health check hota hai, fail pe automatic rollback aur alert" — ye line senior signal deti hai.
+
+Rollback ke 2 levels samjho:
+- **App rollback** — purana SHA wapas: `rollout undo` ya old image tag
+- **Infra rollback** — `terraform` se pehle worked state pe: destroy/re-apply
+
+Dono ko mix mat karo — app version revert karne ka matlab cluster ko gira dena nahi hai.
+
+### Observability — deploy ke baad ki nigrani
+
+Pipeline green ho gaya par user dekh rahe hain errors — to kya fayda? Isliye saath me **Prometheus scrape config** (app ka `/metrics` endpoint) aur **Grafana dashboard** chahiye, taki rollout ke turant baad latency/error rate dikhe. Minimal setup: app me Counter/latency histogram, `prometheus.yml` me target, dashboard me QPS + p95 + error rate. Alerts ka rule: **symptom pe alert** (error rate badha), cause pe nahi (pod restart) — kyunki symptom hi user ko affect karta hai.
+
+Minimum production visibility kya dikhna chahiye:
+- **RED** — Rate (QPS), Errors, Duration (p95/p99)
+- **Alerts** — error rate threshold 5 min cross → Slack/email
+- **Logs** — request logs with `correlation_id` — trace hi problem dekhne ka raasta
+
+Ye teen line hi "production observability" ka proof ban jati hai.
+
+### Interview angle — poora flow ek breath me
+
+"Ek app production me kaise laoge?" ka answer frame: **commit → CI (lint/test/scan) → image (SHA tag, GHCR) → staging auto → approval → prod → rollout status → health check → rollback if fail → dashboards par nazar**. Sath me bolo ki infra `Terraform` se hai, config `ConfigMap/Secret` me hai, state Git me. Ye 6-7 link ka chain bolna hi end-to-end samajh dikhata hai — tools ka naam sirf uske aage jodna.
+
+Bonus: ek **Go/No-Go criteria** banao — deploy ke baad "sahi hai kaise pata chalega" (health 200, error rate under 1%, p95 budget me). Ye Go/No-Go threshold bolna hi reliability ka difference hai juniors se.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] GitHub Actions se CI/CD pipeline banana (lint + test + build + scan)

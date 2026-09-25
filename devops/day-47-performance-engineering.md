@@ -15,6 +15,43 @@
 4. **Verify**: load tests (k6, Vegeta, JMeter, locust) — steady-state + spike + soak
 5. **Monitor**: SLO metrics + alerts; regression guard in CI (perf budget)
 
+### Percentiles vs average — p99 kyun important hai
+
+Performance me sabse pehla mindset fix: **average (mean) mat dekho, percentiles dekho**. Mean dhokha deta hai — 99 logo ko 10ms aur 1 ko 10,000ms do to average theek dikhega, par wo 1 user pura din miserable hai. **Percentiles**: `p50` = median, typical user experience; `p95` = 95% logo se acha, worst 5% ka entry point; `p99` = sirf 1% worst — real user ka pain aur systems ka hidden bottleneck yahin dikhta hai. Production me p99 spike = GC pause, DB lock, connection pool exhaustion — jo mean me gayab ho jata hai. SLO typically p95/p99 pe likhe jaate hain (Day 47 ke load test thresholds me `p(95)<200, p(99)<500` isi liye). Aur haan: **bufferbloat/queueing** me percentile ekdam zaroori — jab ek bhi request slow hoti hai, wo sabke aage queue lagati hai (head-of-line). Ek aur concept: **saturation** (kitna resource/CPU use ho raha) latency badhne se pehle signal deta hai. Line: p50 = experience, p99 = discipline.
+
+### Caching — sabse bada single lever
+
+**Cache** = same computation/lookup dobara karne se bachna — often 10-100x. Cache ki duniya **layers** me chalti hai, bahar se andar tak:
+
+| Layer | Kya cache | TTL/invalidation |
+|---|---|---|
+| **Browser** | static assets | `Cache-Control: max-age=..., immutable` |
+| **CDN/Edge** | static + hot API | edge TTL + purge |
+| **App cache (Redis)** | DB query results | TTL (e.g., 5m) + key invalidation |
+| **DB buffer/index** | pages, indexes | automatic + query tuning |
+
+Rules: (1) **kya cache** — read-heavy, expensive, tolerate-thoda-stale data (product list OK; account balance NO); (2) **cache key** me variations bhi daalo (locale, user plan); (3) **invalidation strategy** likho — TTL (simple) ya event-based purge (stale dikhta hai to write pe delete); (4) **thundering herd** — expired key pe sab ek saath DB pe na toot jayein (stale-while-revalidate, lock); (5) **stampede on cold cache** — deploy ke baad burst, warm-up karo. Classic gotcha: cache se galat personalized data dikhna (key me user missing) — security bug. Kahan cache nahi: real-time inventory exact count jahan stale = paisa.
+
+### CDN aur edge — duniya ko paas lao
+
+**CDN** (Azure CDN/Front Door, CloudFront) = static files (images, JS, CSS) ko duniya bhar ke **edge PoPs** pe cache karo — user ko uske nazdeek se serve, origin se nahi. Fayda: latency 200ms → 20ms, origin ka load 90% kam, availability (origin down to edge cache still serves). Static ke alava: **cacheable API responses** (public catalog GET) bhi CDN pe; **dynamic acceleration** (route optimization, TLS termination at edge). Config points: cache **key** (query params include/exclude), **TTL** per content type (immutable hashed assets = 1y; HTML = short), **origin shield**, **purge** on deploy (ya versioned filenames `/app.abc123.js` — best practice, purge ki zaroorat hi nahi). **Front Door** global L7 + WAF + health-based failover bhi deta hai (Day 41 DR me bhi yahi). Common miss: `Cache-Control` headers hi nahi set — CDN enable kiya par sab MISS. Verification: response header me `X-Cache: HIT` check karo.
+
+### Autoscaling — scale before/while it hurts
+
+**Autoscaling** = load ke hisaab se replicas badhana/ghatana — performance + cost dono. K8s me: **HPA** (CPU/memory/custom metric pe `kubectl autoscale deployment --cpu-percent=60 --min=2 --max=10`), **cluster autoscaler** (nodes khud add/remove), **KEDA** (event/queue metrics, Day 43), **VPA** (right-size requests — FinOps se juda). VM world: **VMSS** scale sets, App Service rules. Tuning: **min** = steady baseline (cold start se bachne ke liye 2 rakho, 0 nahi agar latency-tight), **max** = cost cap, **scale-up** fast (cool-down chhota) par **scale-down** dheere (flapping se bachne ke liye stabilization window). Gotcha: scaling se pehle **single-threaded bottleneck** (DB connection pool) fix karo — 10 replicas = 10x DB load, aur sab wahi lock pe phanste. Scale-out ke saath **stateless** banna padta hai. Interview: "p99 degrade during spike?" → check saturation + HPA lag/rule + DB pool — not just "add replicas".
+
+### Load testing — k6 se proof lo
+
+"Fast lagta hai" nahi — **prove** karo. Load tests ke types: **ramp** (gradual, capacity find), **spike** (sudden 10x — autoscaler reaction), **soak** (long duration — memory leak, connection leak, GC drift), **stress** (break point tak). Tool: **k6** (scriptable, thresholds CI me), Vegeta, JMeter, locust. k6 me `stages` se ramp/spike, `thresholds` se gate: `http_req_duration: ['p(95)<200']`, `http_req_failed: ['rate<0.01']` — threshold fail = exit non-zero = **CI fail**. Flow: **baseline** lo (pehle optimization ke numbers) → fix karo → re-test → % improvement document. Load test staging pe real prod-like data se karo (cache cold/warm dono test). Dangers: load test ko prod pe bina plan ke chalana = self-DDoS. Perf budget CI me: "p95 < 250ms, page < 1MB" — regression aaye to build break — ye **regression guard** hai.
+
+### Profiling — guess mat karo, dekho
+
+Optimize se pehle **locate** karo — profiler/btrace dikhata hai time kahan ja raha hai. Python: **py-spy** (`py-spy record -o profile.svg -p PID` → **flamegraph** — kaunsi function sab zyada CPU le rahi), cProfile. Go: pprof. Java: async-profiler/PerfView. DB side: **query plan** (`EXPLAIN ANALYZE` — seq scan vs index), slow query log — often 80% time ek query me hai. APM/Distributed trace: ek request ka waterfall — 70% time kis span me. Common hotspots jo pehle check karo (order of impact): (1) **N+1 queries**, (2) missing index, (3) unbounded/paginated-missing APIs, (4) no cache on hot read, (5) sync blocking in async path, (6) big payloads no compression. Flamegraph dekh ke fix: ek function 60% le rahi hai → usi pe jaao. Bina profile ke optimization = bagair diagnosis ke dawa — kabhi kabhi galti ho jati hai.
+
+### Performance budgets aur monitoring
+
+**Perf budget** = team ke liye written numbers: `p95 < 200ms`, `LCP < 2.5s` (frontend), `page < 1MB`, `error < 1%` — ye **CI gate** ya dashboards pe enforced hote hain (Day 46 bhi isi idea pe hai). Budget nahi to har release thoda-thoda slow hota jaata hai — **performance regression** kabhi pata nahi chalta (**boiling frog**). Monitoring: **RED** (Rate, Errors, Duration percentiles) per service + saturation metrics (queue depth, CPU, connection pool). Alert **SLO** pe, "feels slow" pe nahi. Post-deploy: canary ke waqt latency compare (Day 46 rollout ke saath), budget cross hue to rollback. Story pattern interview ke liye: "p95 800ms tha → trace se N+1 dikha → index+JOIN → 180ms → CDN → 40ms → budget CI me lock kiya, ab regression ruk gaya." Ek line: performance engineering = measure → locate → optimize → verify → guard (budget), cycle repeat.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] Latency percentiles vs averages — why p99, not mean

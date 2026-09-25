@@ -1,6 +1,6 @@
 # Deep Dive: Service Mesh — Istio, Envoy, Linkerd (Traffic, Security, Observability)
 
-> **Kaha ka hai:** Day 33 ka gahra version. Network control bina app-code change: mTLS, retries, timeouts, canary, tracing — sab mesh layer me.
+> **Standalone deep dive:** Network control bina app-code change: mTLS, retries, timeouts, canary, tracing — sab mesh layer me.
 
 ---
 

@@ -1,6 +1,6 @@
 # Deep Dive: DNS — Internet Ki Phonebook Poori Samajh
 
-> **Kaha ka hai:** Day 5 (Networking) ka gahra version. Har `curl`, `ssh`, `ping` ke peeche DNS ka hi kaam hai. Bina DNS ke internet kaam hi nahi karega.
+> **Standalone deep dive:** Har `curl`, `ssh`, `ping` ke peeche DNS ka hi kaam hai. Bina DNS ke internet kaam hi nahi karega.
 
 ---
 

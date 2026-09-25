@@ -1,6 +1,6 @@
 # Deep Dive: Performance Engineering — Measure, Cache, Scale, Load-Test, Profile
 
-> **Kaha ka hai:** Day 47 ka gahra version. "Fast" comes from science: percentiles not averages, measure-first, optimize the real bottleneck (cache/CDN/scale/DB), verify with load tests, guard with budgets in CI.
+> **Standalone deep dive:** "Fast" comes from science: percentiles not averages, measure-first, optimize the real bottleneck (cache/CDN/scale/DB), verify with load tests, guard with budgets in CI.
 
 ---
 

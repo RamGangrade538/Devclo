@@ -1,6 +1,6 @@
 # Deep Dive: Azure Networking — VNet, Subnet, NSG, Load Balancer, DNS, Bastion, Private Endpoints
 
-> **Kaha ka hai:** Day 23 ka gahra version. Azure me infrastructure banane se pehle networking ka solid base chahiye. Ye **cloud networking ka backbone** hai.
+> **Standalone deep dive:** Azure me infrastructure banane se pehle networking ka solid base chahiye. Ye **cloud networking ka backbone** hai.
 
 ---
 

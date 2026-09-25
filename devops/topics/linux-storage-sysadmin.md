@@ -1,6 +1,6 @@
 # Deep Dive: Linux Storage & Sysadmin — Disk, LVM, Backup, Logs Manage Karna
 
-> **Kaha ka hai:** Day 2 (filesystem) + Day 13 (automation) ke production cover. Cloud VM/Docker/K8s sab **disk** pe chalti hai — disk full ho to app crash. Ye deep dive OS admin ka core hai.
+> **Standalone deep dive:** Cloud VM/Docker/K8s sab **disk** pe chalti hai — disk full ho to app crash. Ye deep dive OS admin ka core hai.
 
 ---
 

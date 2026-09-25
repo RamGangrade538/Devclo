@@ -1,6 +1,6 @@
 # Deep Dive: Cloud & Network Security Architecture — Zero Trust, IAM, Sentinel, Compliance
 
-> **Kaha ka hai:** Day 49 ka gahra version. Security = layered (identity → network → app → data → people). Zero Trust replaces the perimeter. Proof on Azure but patterns universal.
+> **Standalone deep dive:** Security = layered (identity → network → app → data → people). Zero Trust replaces the perimeter. Proof on Azure but patterns universal.
 
 ---
 

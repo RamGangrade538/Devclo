@@ -1,6 +1,6 @@
 # Deep Dive: Distributed Tracing & OpenTelemetry — Request Ki Poori Yatra
 
-> **Kaha ka hai:** Day 24/25 (Prometheus/ELK) + Day 47 (perf) ka third pillar. Metrics = "kya?", Logs = "kya hua?", **Traces = "kaise slow".** Modern observability = teeno ka correlation. OpenTelemetry is us sabka standard.
+> **Standalone deep dive:** Metrics = "kya?", Logs = "kya hua?", **Traces = "kaise slow".** Modern observability = teeno ka correlation. OpenTelemetry is us sabka standard.
 
 ---
 

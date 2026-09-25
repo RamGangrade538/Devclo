@@ -1,6 +1,6 @@
 # Deep Dive: Serverless & Event-Driven — Functions, Durable, Event Grid, KEDA, Cold Start
 
-> **Kaha ka hai:** Day 43 ka gahra version. Event-driven systems react; serverless makes them cheap + auto-scale. Core: triggers/bindings, queue reliability, orchestration, scale-to-zero, cold start realities.
+> **Standalone deep dive:** Event-driven systems react; serverless makes them cheap + auto-scale. Core: triggers/bindings, queue reliability, orchestration, scale-to-zero, cold start realities.
 
 ---
 

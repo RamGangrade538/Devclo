@@ -1,6 +1,6 @@
 # Deep Dive: Observability — SLI/SLO/SLA, Prometheus, Grafana, ELK, OpenTelemetry
 
-> **Kaha ka hai:** Day 24-25, 27 ka gahra version. "It works" nahi — **proof do** ki system healthy. Observability = **app ke andhar ki haalat ko bahar se batana** bina code fix kare.
+> **Standalone deep dive:** "It works" nahi — **proof do** ki system healthy. Observability = **app ke andhar ki haalat ko bahar se batana** bina code fix kare.
 
 ---
 

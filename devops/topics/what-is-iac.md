@@ -1,6 +1,6 @@
 # Deep Dive: IaC & Terraform — Infrastructure as Code (Production Grade)
 
-> **Kaha ka hai:** Day 22-23 ka gahra version. "Click-click" se **version-controlled, reviewable, reproducible** infrastructure ka safar.
+> **Standalone deep dive:** "Click-click" se **version-controlled, reviewable, reproducible** infrastructure ka safar.
 
 ---
 

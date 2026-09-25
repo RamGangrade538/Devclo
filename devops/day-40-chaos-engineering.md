@@ -11,6 +11,70 @@ Ab system complex hai — murphy's law guaranteed failures. **Chaos engineering*
 
 Tools: **Litmus** (K8s native, ChaosEngine CRDs, experiment catalog, Azure AKS support), **Chaos Mesh** (K8s, pod/network/stress/dns clocks/IO), **Azure Chaos Studio** (VM, VMSS, AKS, and with target/campaign), Swarm/GameDay manual.
 
+### Chaos engineering kya hai — jaan-boojh kar tootna
+
+**Chaos engineering** = production jaisi system pe **planned, controlled** tarike se failure inject karke dekhna ki system apna kaam karta rehta hai ya nahi. Ye random destruction nahi hai — ye ek **scientific experiment** hai: pehle hypothesis likho ("3 pods me se 1 mare to p99 < 200ms rehni chahiye"), phir fault do, phir metrics pe compare karo. Kyun? Kyunki **Murphy's law** production me guaranteed hai — pod ek din marega hi, network ek din dega, disk bhar jayega. Question ye nahi "kya failure hoga" balki "kya humara system uske baad bhi chalega". Ye Netflix ke **Chaos Monkey** se famous hua — unka logic simple tha: "jo cheez tumhe aaj marne se darrati hai, wo kal asli outage me maregi; pehle marwao, resilience banao." Day 40 ka tone: chaos = confidence ka proof, dare ka nahi.
+
+### Steady state hypothesis — chaos se pehle line khincho
+
+Chaos ka **step 0** hai **steady state** define karna — kyunki bina baseline ke tumhe pata hi nahi chalega ki system "toot gaya" ya "hamesha aisa hi tha". Steady state typically kuch SLO metrics hoti hain: `p99 < 200ms`, `error rate < 1%`, `queue depth < 100`, `checkout success > 99.5%`. Dashboard kholo, in metrics ko note karo, phir experiment chalao, phir wahi dashboard compare karo. Agar fault ke baad bhi metrics steady rahe — hypothesis PASS, system resilient hai. Agar p99 2s ho gaya — FAIL, aur wo tumhare liye asli finding hai. Ye loop hai: **steady state → inject → observe → verdict → fix**. Bina hypothesis ke jo log karte hain wo "random breakage" hai — chaos nahi, vandalism.
+
+### Fault types — kya-kya tod sakte ho
+
+Chaos ke common fault types (k8s world me):
+
+- **Pod kill** — ek pod mara do; HPA/self-heal theek karega?
+- **Network delay/latency** — 2s delay daalo; timeouts/retries sahi fire karte hain ya cascade?
+- **Network partition/drop** — packets gayab; service discovery kaise react karti hai?
+- **CPU/RAM stress (hog)** — resource starve; autoscaler time pe aaya ya nahi? throttling?
+- **Disk IO latency/fill** — log write block hua to app hang?
+- **DNS flakiness** — service names resolve nahi hue; retry logic kaun bachata hai?
+- **AZ/node failure** — pura node gaya; pods reschedule hue ya stuck?
+
+Har fault ka apna sawal hota hai. **Chaos Mesh** me ye sab CRs hain: `PodChaos`, `NetworkChaos`, `StressChaos`, `DNSChaos`, `IOChaos`, `TimeChaos`. **Litmus** me ready-made experiments catalog me milte hain (pod-delete, pod-cpu-hog...). Rule: ek experiment = ek hypothesis — sab ek saath mat todo, warna root cause kabhi nahi milega.
+
+### Litmus vs Chaos Mesh vs Azure Chaos Studio — kab kaunsa
+
+Teen tools ka practical farak:
+
+| Tool | Kahan | Kaise | Best for |
+|---|---|---|---|
+| **Litmus** | K8s (AKS/EKS/GCP) | `ChaosEngine` CRD + experiment catalog | K8s-native, community experiments |
+| **Chaos Mesh** | K8s | `PodChaos`/`NetworkChaos`/... CRs | fine-grained network/stress faults |
+| **Azure Chaos Studio** | Azure-native (VM, VMSS, AKS) | targets + experiments + campaigns | infra-level Azure services, managed |
+
+**Litmus** ka flow: operator install → `ChaosEngine` banao (target selector + experiment) → `ChaosResult` me verdict aata hai. **Chaos Mesh** Helm se install, CR apply karo, done. **Azure Chaos Studio** me pehle service ko **target** banao (enable karo), phir experiment banao, phir schedule/campaign chalao. Small cluster pe Chaos Mesh/Litmus se shuru karo; pura Azure estate pe studio. Wrk eng job me often Litmus/Chaos Mesh kyunki eks/aks/aks dono me kaam karta hai — interview me dono naam suna rakho.
+
+### Blast radius — pehla safety rule
+
+**Blast radius** = tumhara experiment kitna affect karega. Golden rules:
+
+1. **Staging first**, prod kabhi sudden nahi — trust banao pehle.
+2. **Limited scope**: `mode: one` (ek pod), ek namespace — "all pods" kabhi mat likho pehle me.
+3. **Time-box**: `TOTAL_CHAOS_DURATION` 60s, 2 min — unlimited mat chalao.
+4. **Abort path ready**: rollback command likhi ho, `kubectl delete chaosengine...` maloom ho.
+5. **On-call aware**: game day schedule karo (e.g., off-peak 21:00-23:00), war room me runbook khula.
+6. **Blast radius badhao gradually**: 1 pod → 1 replica set → 1 AZ → region failover (sirf jaruri ho to).
+
+Ek chhoti si misstep (jaise sabhi pods kill kar dena) chhoti team ke liye pura outage ban sakti hai — chaos ka matlab carelessness nahi, **disciplined destruction** hai.
+
+### GameDay — team ke saath drill
+
+**GameDay** = scheduled drill jahan team milkar chaos experiments chalati hai, dashboards dekhti hai, aur baad me **blameless post-mortem** karti hai. Typical 2-hour flow: 10 min briefing (steady state, hypotheses) → 60-70 min 2-3 experiments → 30-40 min post-mortem + action items. Ye fire drill jaisa hai — school me aag ki practice kabhi asli aag me kaam aati hai. Output: **resilience budget** (kitna SLO bacha), runbook updates, aur fix tickets ("autoscaler 4 min me aata hai, SLO 1 min maangti hai → tune karo"). Blameless matlab: galti system/me process me dhoondho, insaan me nahi — warna log agla experiment chupke se band kar denge. Cadence: mahine me ek chhota, quarter me ek bada game day.
+
+### Common gotchas — yahan log phaste hain
+
+- **Observability missing** — chaos se pehle Prometheus/Grafana/APM chalu ho, warna kuch dikh hi nahi payega.
+- **Hypothesis nahi likha** — "bas dekhte hain" = entertainment, engineering nahi.
+- **Prod first try** — sabse badi galti; pehle staging me confidence banao.
+- **Cascade risk ignored** — retry storm, connection pool exhaustion — chaos often ye expose karta hai; uska plan bhi rakho.
+- **No game day cadence** — ek baar chala ke chhod diya; resilience decay hoti hai (code change hote rehte hain).
+- **Alerts off** — chaos ke waqt alerts fire hone chahiye; wo bhi test ho raha hai.
+
+### Interview angle — chaos ke sawal
+
+Interview me typical: "chhoti team hai, chaos kaise shuru karoon?" → steady state SLO define → staging me Litmus pod-delete + network delay → blast radius limit → gameday cadence → prod me gradual. "Steady state kya hota hai?" → SLO indicators jise fault ke baad bhi maintain hona chahiye. "Litmus vs Chaos Mesh?" → Litmus = catalog + ChaosEngine CRD, Chaos Mesh = fine-grained CRs (network/stress/DNS). "Blast radius kya hai?" → experiment ka scope (1 pod/ns) — sabse bada safety lever. "Chaos aur DR drill alag kaise?" → chaos = component resilience, DR = full-site failover (Day 41) — dono complement karte hain. Ek line: chaos = "confidence with evidence", not "random breakage".
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] Steady-state hypothesis → fault → observe loop

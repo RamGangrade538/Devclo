@@ -895,7 +895,8 @@ window.Lab = (function () {
     outEl = document.getElementById("labOut");
     inputEl = document.getElementById("labInput");
     terminalEl = document.getElementById("labTermWrap");
-    currentDay = window.App.current() >= 0 ? window.App.current() : 1;
+    currentDay = window.App.current() >= 0 ? window.App.current()
+      : ((window.App.DAYS || []).find(d => d.num >= 1) || { num: 2 }).num;
 
     line('<span class="t-muted">DevClo Practice Lab — dummy Linux sandbox.</span>');
     line('<span class="t-muted">Commands: pwd ls cd mkdir touch cat echo chmod ps git docker kubectl terraform az python3 ...</span>');

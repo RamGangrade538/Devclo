@@ -1,6 +1,6 @@
 # Deep Dive: CI/CD vs Continuous Delivery vs Continuous Deployment — Poori Kahani
 
-> **Kaha ka hai:** Day 8-9-10-14 ka gahra version. Interview me 90% yehi poocha jata hai. Concept clear ho to pipeline design aasani se aata hai.
+> **Standalone deep dive:** Interview me 90% yehi poocha jata hai. Concept clear ho to pipeline design aasani se aata hai.
 
 ---
 

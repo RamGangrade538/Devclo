@@ -1,6 +1,6 @@
 # Deep Dive: Policy as Code — OPA, Rego, Gatekeeper, Kyverno
 
-> **Kaha ka hai:** Day 37 ka gahra version. Policy = code, versioned, tested, enforced at admission. Works for k8s, Terraform, clouds, HTTP — one engine (OPA) anywhere.
+> **Standalone deep dive:** Policy = code, versioned, tested, enforced at admission. Works for k8s, Terraform, clouds, HTTP — one engine (OPA) anywhere.
 
 ---
 

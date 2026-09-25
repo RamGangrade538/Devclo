@@ -1,6 +1,6 @@
 # Deep Dive: Secret Management — Key Vault, Vault, SOPS, External Secrets (ESO)
 
-> **Kaha ka hai:** Day 35 ka gahra version. Secrets never in git/image/.env — central store, RBAC, rotation, audit, K8s integration. "Secret zero" = first secret via identity, not a static master credential.
+> **Standalone deep dive:** Secrets never in git/image/.env — central store, RBAC, rotation, audit, K8s integration. "Secret zero" = first secret via identity, not a static master credential.
 
 ---
 

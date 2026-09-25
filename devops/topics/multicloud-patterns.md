@@ -1,6 +1,6 @@
 # Deep Dive: Multi-Cloud & Cloud-Agnostic Architecture — Portability, Terraform, Abstractions
 
-> **Kaha ka hai:** Day 42 ka gahra version. "Runs on any cloud" is engineering discipline, not luck: containers → k8s → Terraform modules → service abstractions → OTel. Trade-offs (complexity/latency) first, then strategy.
+> **Standalone deep dive:** "Runs on any cloud" is engineering discipline, not luck: containers → k8s → Terraform modules → service abstractions → OTel. Trade-offs (complexity/latency) first, then strategy.
 
 ---
 

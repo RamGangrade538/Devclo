@@ -1,6 +1,6 @@
 # Deep Dive: Helm — Kubernetes Package Manager (Charts, Values, Templates, Lifecycle)
 
-> **Kaha ka hai:** Day 32 ke GitOps/Capstone me charts use hote hain aur Week 3 (K8s) me bhi useful. Helm = "npm/apt for Kubernetes": package all your manifests as a **Chart**, parameterized with `values.yaml`, templated by Go templates — clean upgrades/rollbacks.
+> **Standalone deep dive:** Helm = "npm/apt for Kubernetes": package all your manifests as a **Chart**, parameterized with `values.yaml`, templated by Go templates — clean upgrades/rollbacks.
 
 ---
 
