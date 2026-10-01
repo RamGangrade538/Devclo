@@ -529,9 +529,11 @@ async function pipeInto(md, num, opts) {
   }
   html = '<div class="seg-nav" id="segNav">' +
     '<span class="seg-nav-label">Go to:</span>' +
-    '<a class="seg-nav-link" data-seg="learn" href="#seg-learn">📚 Learn</a>' +
-    '<a class="seg-nav-link" data-seg="practice" href="#seg-practice">🧪 Practice</a>' +
-    '<a class="seg-nav-link" data-seg="platform" href="#seg-platform">🛠️ Platform</a>' +
+    '<a class="seg-nav-link" href="#learn" data-seg="learn">📚 Learn</a>' +
+    '<a class="seg-nav-link" href="#lab" data-seg="practice">🧪 Practice Lab</a>' +
+    '<a class="seg-nav-link" href="#platform" data-seg="platform">🛠️ Platform</a>' +
+    '<a class="seg-nav-link" href="#study" data-seg="cards">🎴 Cards</a>' +
+    '<a class="seg-nav-link" href="#quiz" data-seg="quiz">📝 Quiz</a>' +
     "</div>" + html;
   els.content.innerHTML = html;
   els.content.querySelectorAll("#segNav .seg-nav-link").forEach(a => {
@@ -544,10 +546,12 @@ async function pipeInto(md, num, opts) {
 }
 
 function gotoSeg(seg) {
-  if (!["learn", "practice", "platform"].includes(seg)) seg = "learn";
-  window.location.hash = "seg-" + seg;
+  if (seg === "learn") return loadLearn();
+  if (seg === "practice") return loadLab();
+  if (seg === "platform") return loadPlatform();
+  if (seg === "cards") return loadStudyPage("cards");
+  if (seg === "quiz") return loadStudyPage("quiz");
   loadStart();
-  setTimeout(() => scrollToSeg(seg), 80);
 }
 
 function escText(s) {
@@ -873,6 +877,7 @@ function loadStart() {
         dashTile("practice", "🧪", "Practice Lab", "Sandbox terminal + labs try karo") +
         dashTile("platform", "🛠️", "Platform", "Day 31-50: Platform Engineering + Advanced") +
         dashTile("interview", "🎯", "Interview Q&A", "Day-wise questions + tricky") +
+        dashTile("study", "🧠", "Study Room", "Flashcards + quiz + knowledge map") +
       "</div>" +
 
       '<h2 class="dash-sec-title">🗂️ DevOps Topics<span class="sec-note"> (separate topic library — 50-day course se alag)</span></h2>' +
@@ -914,6 +919,7 @@ function loadStart() {
       else if (go === "practice") loadLab();
       else if (go === "platform") loadPlatform();
       else if (go === "interview") loadInterviews(null);
+      else if (go === "study") loadStudyPage("hub");
       else if (go === "topics") loadTopicsDashboard();
       else if (go === "help") loadHelp();
       else if (go === "chat") toggleChat(true);
@@ -976,8 +982,32 @@ function loadPlatform() {
 }
 
 function scrollToSeg(seg) {
-  const acc = els.content.querySelector("#acc-" + seg);
-  if (acc) acc.scrollIntoView({ behavior: "smooth", block: "start" });
+  const link = els.content.querySelector('#segNav .seg-nav-link[data-seg="' + seg + '"]');
+  if (link) link.scrollIntoView({ behavior: "smooth", block: "nearest" });
+}
+
+/* ---------- Study Room (flashcards + quiz + knowledge map) ----------
+   UI lives in study.js / study.css; this is only the router + chrome. */
+function loadStudyPage(kind, arg) {
+  current = -8;
+  setSideNav(false);
+  if (window.location.hash !== "#study") window.location.hash = "study";
+  els.footnav.hidden = true;
+  els.content.classList.remove("markdown-body");
+  els.markDoneBtn.style.display = "none";
+  renderSidebar();
+  if (!window.Study) {
+    els.content.innerHTML = '<div class="notice">❌ study.js load nahi hua — index.html me script tag check karo.</div>';
+    return;
+  }
+  try {
+    window.Study[kind || "hub"](els.content, arg);
+  } catch (err) {
+    els.content.innerHTML = '<div class="notice">❌ ' + escText(err.message) + "</div>" +
+      '<button class="cta" onclick="loadStart()">← Back to Home</button>';
+    if (window.console) console.error("study", err);
+  }
+  els.content.scrollTop = 0;
 }
 
 /* ---------- DevOps Topics Dashboard + Module pages (course se independent) ---------- */
@@ -1088,10 +1118,9 @@ async function loadModule(slug) {
 }
 
 function activateSeg(seg, setHash) {
-  if (!["learn", "practice", "platform"].includes(seg)) return;
-  els.content.querySelectorAll(".acc").forEach(a => a.classList.remove("open"));
-  const acc = els.content.querySelector("#acc-" + seg);
-  if (acc) acc.classList.add("open");
+  if (["learn", "practice", "platform", "cards", "quiz"].indexOf(seg) < 0) return;
+  const link = els.content.querySelector('#segNav .seg-nav-link[data-seg="' + seg + '"]');
+  if (link) link.classList.add("active");
   if (setHash && window.location.hash !== "#seg-" + seg) window.location.hash = "seg-" + seg;
 }
 
@@ -1223,6 +1252,12 @@ function paletteSections() {
       go: () => loadModule(m.slug)
     })) },
     { group: "Actions", items: [
+      { num: "🧠", title: "Study Room (flashcards + quiz + map)", hint: "spaced repetition", go: () => loadStudyPage("hub") },
+      { num: "🎴", title: "Flashcards", hint: "Quick Notes se bane cards", go: () => loadStudyPage("cards") },
+      { num: "📝", title: "Quiz", hint: "self-graded sawaal", go: () => loadStudyPage("quiz") },
+      { num: "🕸️", title: "Knowledge Map", hint: "module prereq graph", go: () => loadStudyPage("graph") },
+      { num: "💾", title: "Export progress (JSON)", hint: "backup banao", go: () => window.Study && window.Study.exportJSON() },
+      { num: "📥", title: "Import progress (JSON)", hint: "backup wapas laao", go: () => window.Study && window.Study.importJSON() },
       { num: "⌂", title: "Start Here (Home)", hint: "landing page", go: () => loadStart() },
       { num: "🗂️", title: "DevOps Topics Dashboard", hint: "40 independent topic modules — 50-day se alag", go: () => loadTopicsDashboard() },
       { num: "🎯", title: "Interview Q&A (all days)", hint: "questions + tricky", go: () => loadInterviews(null) },
@@ -1593,6 +1628,7 @@ els.prevBtn.addEventListener("click", () => {
   else if (current === -5) loadLab();
   else if (current === -2) loadStart();
   else if (current === -11) loadTopicsDashboard();
+  else if (current === -8) loadStart();
   else if (current <= 0) loadStart();
   else if (current >= 1000) {
     const d = EXP_DAYS.find(x => x.n === current - 1000 - 1);
@@ -1606,6 +1642,7 @@ els.nextBtn.addEventListener("click", () => {
   else if (current === -5) loadStart();
   else if (current === -2) loadDay(1);
   else if (current === -10 || current === -11) loadStart();
+  else if (current === -8) loadStart();
   else if (current >= 1000) {
     const d = EXP_DAYS.find(x => x.n === current - 1000 + 1);
     if (d) loadExpanded(d.n); else loadStart();
@@ -1633,6 +1670,7 @@ els.resetBtn.addEventListener("click", () => {
     else if (current === -5) loadLab();
     else if (current === -10) loadTopicsDashboard();
     else if (current === -11) loadModule(currentModuleSlug);
+    else if (current === -8) loadStudyPage("hub");
     else if (current >= 1000) loadExpanded(current - 1000);
     else loadDay(current);
   }
@@ -1644,6 +1682,24 @@ const interviewBtn = document.getElementById("interviewBtn");
 if (interviewBtn) interviewBtn.addEventListener("click", () => loadInterviews(null));
 const topicsBtn = document.getElementById("topicsBtn");
 if (topicsBtn) topicsBtn.addEventListener("click", () => loadTopicsDashboard());
+const studyBtn = document.getElementById("studyBtn");
+if (studyBtn) studyBtn.addEventListener("click", () => loadStudyPage("hub"));
+const sideStudyBtn = document.getElementById("sideStudyBtn");
+if (sideStudyBtn) sideStudyBtn.addEventListener("click", () => loadStudyPage("hub"));
+
+/* ---------- Mobile drawer (sidebar is display:none below 980px) ---------- */
+(function mobileNav() {
+  const toggle = document.getElementById("navToggle");
+  const scrim = document.getElementById("navScrim");
+  const set = open => document.body.classList.toggle("nav-open", open);
+  if (toggle) toggle.addEventListener("click", () => set(!document.body.classList.contains("nav-open")));
+  if (scrim) scrim.addEventListener("click", () => set(false));
+  document.addEventListener("keydown", ev => { if (ev.key === "Escape") set(false); });
+  // drawer band: tap anywhere in the content column closes it again
+  els.content.addEventListener("click", () => {
+    if (document.body.classList.contains("nav-open") && window.innerWidth < 980) set(false);
+  });
+})();
 
 /* task checkboxes */
 els.content.addEventListener("change", ev => {
@@ -1690,6 +1746,12 @@ document.addEventListener("keydown", ev => {
     ev.preventDefault();
     const ts = document.getElementById("topSearchInput");
     if (ts) ts.focus();
+  } else if (!typing && typeof els.content._cardsKey === "function") {
+    els.content._cardsKey(ev);
+  } else if (!typing && current >= 0 && ev.key === "]") {
+    els.nextBtn.click();
+  } else if (!typing && current >= 0 && ev.key === "[") {
+    els.prevBtn.click();
   }
 });
 
@@ -1701,6 +1763,10 @@ function init() {
   if (hash === "#learn") return loadLearn();
   if (hash === "#platform") return loadPlatform();
   if (hash === "#topics") return loadTopicsDashboard();
+  if (hash === "#study") return loadStudyPage("hub");
+  if (hash === "#cards") return loadStudyPage("cards");
+  if (hash === "#quiz") return loadStudyPage("quiz");
+  if (hash === "#graph") return loadStudyPage("graph");
   if (hash && hash.startsWith("#module-")) return loadModule(hash.slice(8));
   if (hash === "#interviews") return loadInterviews(null);
   if (hash && hash.startsWith("#interview-")) return loadInterviews(parseInt(hash.slice(11), 10));
@@ -1719,7 +1785,7 @@ function init() {
 window.App = {
   DAYS, TOPICS, EXP_DAYS, EXP_PHASES, TOPIC_MODULES, TOPIC_LEVELS, getProgress, isDone, isExpDone, current: () => current,
   loadDay, loadExpanded, loadStart, loadHelp, loadTopic, loadInterviews, loadLab, loadTopicsDashboard, loadModule, modulePct,
-  openPalette, toggleChat, nextUndone, activateSeg, gotoSeg,
+  loadStudyPage, openPalette, toggleChat, nextUndone, gotoSeg, moduleTotal, moduleDone,
   hash: () => window.location.hash,
 };
 
@@ -1742,6 +1808,10 @@ window.addEventListener("hashchange", () => {
   if (h === "#learn") { if (current !== -6) loadLearn(); return; }
   if (h === "#platform") { if (current !== -7) loadPlatform(); return; }
   if (h === "#topics") { if (current !== -10) loadTopicsDashboard(); return; }
+  if (h === "#study" || h === "#cards" || h === "#quiz" || h === "#graph") {
+    if (current !== -8) loadStudyPage("hub");
+    return;
+  }
   if (h && h.startsWith("#module-")) {
     const s = h.slice(8);
     if (!(current === -11 && currentModuleSlug === s)) return loadModule(s);

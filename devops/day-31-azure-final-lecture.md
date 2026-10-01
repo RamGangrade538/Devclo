@@ -175,11 +175,49 @@ RBAC: dev (dev sub), ops (prod Writer), secrets only admins. Cost: tags + 80% bu
 
 ## Practice Exercise | Abhi Karein
 
-1. `az login` + RG, VNet, NSG banao (Demo commands) — portal me topology dekho
-2. Storage (public blob false) + container + file upload → public URL se access **fail** hona chahiye
-3. Key Vault + secret banao; phir AKS me SecretProviderClass se mount karke env var read karo
-4. AKS create → `kubectl get nodes` → nginx deploy → `kubectl port-forward` se browser
-5. Demo `main.tf` se `terraform init → plan → apply → destroy` (2nd apply pe "No changes")
+### Azure DevOps Capstone Assignment — Private, Observable, Cost-Controlled Stack
+
+**Goal:** Terraform se ek chhota production-like Azure platform banao — secure network, private data, managed identity, observable workload, repeatable CI/CD, aur documented cost. Portal ko verification ke liye use karo; final infrastructure Terraform se recreate honi chahiye.
+
+**Assignment rules:**
+
+- Apna code `azure-assignment/` folder me rakho: `main.tf`, `variables.tf`, `outputs.tf`, `terraform.tfvars.example`, `README.md`, aur CI workflow.
+- Git me secret, password, access key, ya `.tfstate` commit mat karo. Key Vault + managed identity/workload identity use karo.
+- Har resource par `owner`, `env`, `project`, aur `managed-by` tags lagao; supported low-cost region/SKU choose karo.
+- Har important step ka verification command aur output evidence me save karo.
+- Assignment ke end me `terraform destroy` ya resource-group cleanup karke empty state verify karo.
+
+**Tasks:**
+
+1. **IaC foundation** — `terraform fmt`, `terraform init`, `terraform validate`, aur `terraform plan` run karo. Resource Group, VNet, storage, Key Vault, workload, aur monitoring resources ko variables se configure karo.
+2. **Network segmentation** — VNet me `app` aur `data` subnets banao. NSG rules sirf required ports allow karein; broad `Internet` access, unnecessary public IP, aur default-allow rules avoid karo.
+3. **Private storage & secrets** — Storage account ka public blob access disable karo, private container me sample file upload karo, aur anonymous access fail hone ka evidence capture karo. Key Vault RBAC se secret store karo; workload identity ko minimum data-plane role do.
+4. **Azure workload** — App Service (recommended, lower cost) ya AKS (advanced) me `/health` endpoint wala sample app deploy karo. Managed identity use karo, TLS/HTTPS verify karo, aur app logs capture karo.
+5. **Gateway & observability** — workload ko APIM ya another managed HTTPS entry point se expose karo. Azure Monitor/Log Analytics me metrics aur logs enable karo, health/CPU alert rule banao, aur ek useful KQL query submit karo.
+6. **Secure CI/CD** — GitHub Actions ya Azure DevOps pipeline me format/validate/plan checks add karo. Apply ko protected environment/approval ke behind rakho; secrets repository settings ya Key_Vault se inject karo.
+7. **Cost & reliability review** — cost estimate, tags, budget alert, autoscaling/right-sizing choice, aur single-point-of-failure notes likho. Low-cost track par App Service use karne ka justification bhi do.
+
+**Submission checklist:**
+
+- [ ] Terraform code, variable examples, lock/working instructions, and architecture diagram
+- [ ] `terraform plan` output plus second plan showing no changes
+- [ ] Network diagram with public/private boundaries and NSG decision
+- [ ] Evidence that anonymous storage access is denied and workload identity/RBAC is least-privilege
+- [ ] Working `/health` endpoint, alert definition, and sample KQL result
+- [ ] CI/CD run showing validation, deployment, and secret-safe configuration
+- [ ] Cost estimate, cleanup output, and short reflection: “next production improvement kya hoga?”
+
+**Evaluation rubric (100 marks):**
+
+| Area | Marks |
+|------|------:|
+| Reproducible Terraform and documentation | 25 |
+| Networking, private access, and least-privilege RBAC | 25 |
+| Workload, CI/CD, and rollback/cleanup plan | 20 |
+| Monitoring, alerting, and useful operational evidence | 15 |
+| Cost awareness and trade-off reasoning | 15 |
+
+**Done when:** koi bhi authorized teammate tumhare instructions follow karke fresh subscription/workspace me infrastructure recreate karke health check, private access, alerting, aur cleanup verify kar sake.
 
 ## Quick Notes | Yaad Rakho
 
