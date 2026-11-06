@@ -90,6 +90,11 @@ After completing this course, you'll be ready for:
 
 ---
 
+## Labs (Hands-On)
+- [Linux Beginner Hands-On Labs (DevOps & Azure)](labs/linux-beginner-hands-on/README.md) — Complete step-by-step labs covering filesystem, commands, pipes/redirection, users/groups, permissions, scripts, and app deployment.
+
+--- 
+
 ## Resources
 
 - [Docker Documentation](https://docs.docker.com/)

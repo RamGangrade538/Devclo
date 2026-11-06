@@ -26,6 +26,9 @@ for p in sorted((ROOT / "expanded").glob("*.md")):
 # DevOps Topics Library — 50-day course se alag, topic-based modules
 for p in sorted((ROOT / "modules").glob("*.md")):
     FILES.append((f"modules/{p.name}", p))
+# 80 Practical Tasks — Ubuntu hands-on labs
+for p in sorted((ROOT / "labs" / "ubuntu-devops-80").glob("*.md")):
+    FILES.append((f"labs/ubuntu-devops-80/{p.name}", p))
 
 # Extra files jo landing/help page dikhata hai
 FILES += [("today-task.md", ROOT / "today-task.md"),

@@ -58,6 +58,25 @@ Linux me basically **sab kuch file hai** — config file hai, log file hai, disk
 
 > Ek line mein: Linux me sab kuch **file hai** (config, log, device, process) aur filesystem ke fixed shelves rule karte hain — jaise godown me har cheez ka apna rack.
 
+## Learning Priority | Kis Order Me Practice Karein
+
+Agar aap beginner ho, toh Linux/DevOps ko is order me practice karo — pehle filesystem ke "fixed shelves" strong karo, phir aage badho:
+
+1. **Basic navigation:** `/`, `/home`, `/root`, `pwd`, `cd`, `ls`
+2. **Configuration:** `/etc`, SSH aur Nginx config
+3. **Logs:** `/var/log`, `journalctl`, `tail -f`
+4. **Services:** `systemctl` — kaunsi service chal rahi hai, start/stop/restart
+5. **Networking:** `ip a`, `ss -tulpn`, `curl`, `dig` — troubleshooting ka pehla step
+6. **Permissions:** `chmod`, `chown`, `sudo`
+7. **Disk management:** `df`, `du`, `/mnt`
+8. **Processes:** `/proc`, `ps`, `top`
+9. **Application management:** `/opt`, `/usr/local/bin`, `/var/lib`
+10. **DevOps tools:** Docker, Jenkins, Kubernetes aur Terraform ke data/configuration paths
+
+**Recommendation:** Sabse pehle `/etc`, `/var/log`, `/home`, `/tmp`, `/opt`, `/usr/local/bin` aur `/var/lib` ko achhe se samjho. Inka practical knowledge server administration aur DevOps troubleshooting me sabse zyada kaam aayega.
+
+> Note: Steps 4 (services) aur 5 (networking) classic Linux lists me aksar chhoot jaate hain, lekin real DevOps incident me yahi sabse pehle use hote hain — isliye yahan add kiye gaye hain.
+
 ## What You'll Learn | Aaj Ki Seekh
 
 - [ ] FHS structure: `/etc` (config), `/var` (logs), `/tmp` (temp), `/proc` (virtual) — kya kahan rakha hai
@@ -153,6 +172,101 @@ Production me har incident isi se shuru hota hai — pehle log padho, phir disk 
 5. Symlink banao `ln -s /etc/hostname ~/lab/host` aur `ls -li` se inode compare karo (hardlink same inode, symlink alag)
 6. `df -h` + `du -sh ~/lab/*` — kitni jagah use hui likho
 7. `grep -c "Listen" /etc/nginx/nginx.conf` — count karo
+
+## Linux for DevOps — Practical Training
+
+Ye 6 modules har DevOps engineer ke daily kaam ke hain. Har module me **kya hai** aur **kaunse commands** chalao — dono diye hain.
+
+### 1. Configuration — `/etc`
+
+**Kya hai:** Server ki saari configuration yahan rehti hai. SSH (`/etc/ssh/sshd_config`), Nginx (`/etc/nginx/nginx.conf`), hostname resolution (`/etc/hosts`), disks (`/etc/fstab`), users (`/etc/passwd`, `/etc/shadow`). Kisi bhi service ka behaviour badalna ho toh pehle `/etc` me uski config dhoondo.
+
+```bash
+ls /etc                                  # saari config files
+cat /etc/os-release                      # OS + version
+cat /etc/hosts                           # hostname → IP mapping
+grep -r "PermitRootLogin" /etc/ssh/      # SSH me root login allowed hai?
+nginx -t                                 # config test karo (syntax check)
+sudo systemctl reload nginx              # reload bina downtime (restart se pehle try karo)
+```
+
+> Rule: config file change karne ke baad **pehle** us tool ka test/preview chalao (`nginx -t`, `sshd -t`), phir reload. Direct `restart` mat maaro.
+
+### 2. Logs — `/var/log`
+
+**Kya hai:** Har service apni activity yahan likhti hai — errors, logins, requests. Troubleshooting ka **pehla step** hamesha log padhna hai. systemd-based distros me `journalctl` central logs deta hai.
+
+```bash
+tail -f /var/log/syslog                  # live log stream (Ctrl+C roko)
+tail -n 100 /var/log/auth.log            # last 100 lines (logins/sudo)
+grep " 500 " /var/log/nginx/access.log   # 500 errors dhoondo
+journalctl -u nginx -f                   # sirf nginx service ke logs (live)
+journalctl --since "1 hour ago"          # pichle ghante ke saare logs
+find /var/log -name "*.gz" -mtime +30 -delete  # 30 din se purane logs clean
+```
+
+> Rule: `/var/log` disk pe badh sakta hai — ise monitor karo, warna disk full hone se app crash hoga (Sensor 4 dekho).
+
+### 3. Permissions — `chmod`, `chown`, `sudo`
+
+**Kya hai:** Kaunsi file kaun padh/ likh/ run kar sakta hai — iska rule. Har file ke 3 sets: **user (u)**, **group (g)**, **others (o)** aur 3 rights: **r=4, w=2, x=1**. Security ka base yahi hai.
+
+```bash
+ls -l file                               # -rw-r--r-- owner group dekh
+chmod 644 config.yml                     # owner read/write, baaki read (safe default)
+chmod 755 deploy.sh                      # owner all, baaki read+execute (script)
+chmod u+x script.sh                      # sirf owner ko execute do
+chown app:app /var/lib/app               # owner:group badlo
+chown -R user:group /opt/app             # poore folder pe recursively
+sudo -u app whoami                       # doosre user ke roop me command chalao
+id                                       # tumhara uid/gid + groups
+```
+
+> Rule: `777` kabhi production me mat lagao — least privilege do. Secrets/config `600`, scripts `755`, normal data `644`.
+
+### 4. Disk management — `df`, `du`, `/mnt`
+
+**Kya hai:** Disk bharne se pehle pata karo kaunsi mount full ho rahi hai aur kis folder ne khaya. Naya disk `/mnt` ya `/data` pe mount hota hai.
+
+```bash
+df -h                                    # har mount pe kitni jagah bachi
+du -sh /var/log/* | sort -rh | head      # sabse bada folder top pe
+lsblk                                    # disks + partitions ka tree
+sudo mount /dev/sdb1 /mnt                # disk ko /mnt pe jodo
+cat /etc/fstab                           # boot pe kaunse disk auto-mount hote hain
+```
+
+> Rule (incident order): `df -h` → full mila → `du -sh * | sort -rh` → culprit folder → old logs/temp clean karo.
+
+### 5. Processes — `/proc`, `ps`, `top`
+
+**Kya hai:** Kaunsi process chal rahi hai, kitni CPU/RAM kha rahi hai. `/proc` ek **virtual filesystem** hai — kernel live data wahan file ki tarah dikhata hai.
+
+```bash
+ps aux                                   # saari running processes
+top                                      # live CPU/RAM (htop better UI)
+cat /proc/cpuinfo                        # CPU details (live)
+cat /proc/meminfo                        # RAM details (live)
+lsof -i :80                              # port 80 kisne hold kiya?
+kill <PID>                               # process ko politely band karo
+kill -9 <PID>                            # force kill (last resort)
+```
+
+> Rule: pehle `kill` (SIGTERM) — process cleanup kar sakti hai. `kill -9` (SIGKILL) tab jab woh na maane; ye graceful nahi hota.
+
+### 6. Application management — `/opt`, `/usr/local/bin`, `/var/lib`
+
+**Kya hai:** Third-party/self-built apps kahan rehti hain. `/opt` = extra software, `/usr/local/bin` = custom binaries/scripts (PATH me), `/var/lib` = app ka runtime state/data (docker yahan rehta hai).
+
+```bash
+ls /opt                                 # installed 3rd-party apps
+ls /usr/local/bin                       # custom commands (PATH me hote hain)
+ls /var/lib/docker                      # docker images/containers ka data
+echo $PATH                              # kaunse folders se commands milti hain
+which docker                            # command kahan se aa raha hai
+```
+
+> Rule: apna tool install karo toh `/usr/local/bin` ya `/opt` prefer karo — `/usr/bin` system package manager ka hai, use gandha mat karo.
 
 ## Quick Notes | Yaad Rakho
 

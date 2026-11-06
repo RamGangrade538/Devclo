@@ -1,0 +1,2 @@
+logrotate state -- version 2
+"/home/ubuntu/Desktop/DevClo/devops/demos/25-linux-logging-networking-lab/work/logrotate/logs/app.log" 2026-10-22-13:28:7

@@ -187,6 +187,45 @@ const TOPIC_MODULES = [
   { slug: "troubleshooting",            title: "Troubleshooting",               emoji: "🩺", level: 7, tagline: "Logs, hypothesis, root cause" },
 ];
 
+/* ---------- 80 Practical Tasks — Ubuntu DevOps Roadmap ----------
+   Content: devops/labs/ubuntu-devops-80/*.md (build_site.py bundle karta hai).
+   Progress: devclo-labs80-progress — alag key, 50-day/topics progress se independent. */
+const LABS80_DIR = "labs/ubuntu-devops-80/";
+const LABS80_PROGRESS_KEY = "devclo-labs80-progress";
+const LABS80_TOTAL = 80;
+const LAB_MODULES = [
+  { slug: "module-01-linux-basics",          title: "Linux Basics & Filesystem", emoji: "🐧", range: [1, 8],   tagline: "audit, navigate, files, find, pipes" },
+  { slug: "module-02-users-permissions",     title: "Users & Permissions",        emoji: "🔐", range: [9, 18],  tagline: "users, groups, chmod, chown, ACL" },
+  { slug: "module-03-processes-services",    title: "Processes & Services",       emoji: "⚙️", range: [19, 26], tagline: "ps, kill, systemd, journalctl" },
+  { slug: "module-04-packages-environment",  title: "Packages & Environment",     emoji: "📦", range: [27, 30], tagline: "apt, nginx, env vars, PATH" },
+  { slug: "module-05-networking",            title: "Networking",                 emoji: "🌐", range: [31, 36], tagline: "IP, DNS, ports, SSH, UFW" },
+  { slug: "module-06-storage-monitoring",    title: "Storage & Monitoring",       emoji: "📊", range: [37, 42], tagline: "df, du, CPU, disks, health report" },
+  { slug: "module-07-bash-scripting",        title: "Bash Scripting",             emoji: "🐍", range: [43, 50], tagline: "args, loops, functions, cron" },
+  { slug: "module-08-deployment-projects",   title: "Deployment Projects",        emoji: "🚀", range: [51, 56], tagline: "layout, deploy script, systemd, rollback" },
+  { slug: "module-09-git-github",            title: "Git & GitHub",                emoji: "🔀", range: [57, 61], tagline: "init, commit, branch, remote, SSH" },
+  { slug: "module-10-docker",                title: "Docker",                     emoji: "🐳", range: [62, 70], tagline: "build, volumes, network, compose" },
+  { slug: "module-11-azure",                 title: "Azure",                      emoji: "☁️", range: [71, 76], tagline: "VM, NSG, SSH, deploy, cleanup" },
+  { slug: "module-12-cicd-advanced",         title: "CI/CD & Advanced",            emoji: "🏁", range: [77, 80], tagline: "Actions, GHCR, auto-deploy, capstone" },
+];
+function getLabsProgress() {
+  try {
+    const v = JSON.parse(localStorage.getItem(LABS80_PROGRESS_KEY) || "[]");
+    return Array.isArray(v) ? v.filter(n => Number.isInteger(n) && n >= 1 && n <= LABS80_TOTAL) : [];
+  } catch (e) { return []; }
+}
+function saveLabsProgress(arr) { localStorage.setItem(LABS80_PROGRESS_KEY, JSON.stringify(arr)); }
+function isLabTaskDone(n) { return getLabsProgress().includes(n); }
+function toggleLabTask(n, done) {
+  let list = getLabsProgress();
+  list = done ? list.concat(n) : list.filter(x => x !== n);
+  saveLabsProgress(Array.from(new Set(list)).sort((a, b) => a - b));
+}
+function labModuleDone(m) { return getLabsProgress().filter(n => n >= m.range[0] && n <= m.range[1]).length; }
+function labsOverall() {
+  const done = getLabsProgress().length;
+  return { done, total: LABS80_TOTAL, pct: Math.round(done / LABS80_TOTAL * 100) };
+}
+
 /* ---------- Detailed Track (Master Plan, Day 1-40) ----------
    Ye MASTER-PLAN-30.md ke 40 detailed day files hain (expanded/ folder).
    Virtual id = 1000 + n, taaki main 50-day progress se collide na ho. */
@@ -382,12 +421,14 @@ function nextUndone() {
 function weekOfDay(n) { const d = DAYS.find(x => x.num === n); return d ? d.week : 0; }
 
 /* ---------- Sidebar ---------- */
-let current = -1; // -1 home, -2 help, -3 deep-dive topic, -4 interviews, -5 lab, -6 learn, -7 platform, -10 topics dashboard, -11 topic module, >=0 day
+let current = -1; // -1 home, -2 help, -3 deep-dive topic, -4 interviews, -5 lab, -6 learn, -7 platform, -10 topics dashboard, -11 topic module, -12 labs dashboard, -13 lab module, >=0 day
 let topicSlug = null;
 let currentTopicSlug = null;
 let currentSub = null;
 let interviewDay = null;
 let currentModuleSlug = "";
+let currentLabSlug = "";
+let currentLabAnchor = "";
 
 let sbMemOpen = new Set();
 function sbOpenSet() { return sbMemOpen; }
@@ -420,52 +461,84 @@ function topicSubs(slug) {
 function renderSidebar() {
   const q = (els.sideSearch.value || "").trim().toLowerCase();
   const frag = document.createDocumentFragment();
+  const groups = [];
   const addGroup = (key, name, items, itemize) => {
     if (!items.length) return;
-    const hasCurrent = items.some(it => it.current);
-    const isOpen = sbMemOpen.has(key) || (sbMemOpen.size === 0 && hasCurrent);
+    groups.push({
+      key: key,
+      name: name,
+      items: items,
+      itemize: itemize,
+      active: items.some(it => it.current || it.cur),
+    });
+  };
+  const inLabs = current === -12 || current === -13;
+  const inTopics = current === -3 || current === -10 || current === -11;
+  const searching = !!q;
+  if (!inLabs || searching) {
+    TOPIC_GROUPS.forEach(grp => {
+      TOPICS.filter(t => grp.slugs.includes(t.slug)).forEach(t => {
+        const subs = topicSubs(t.slug);
+        if (!subs.length) return;
+        const hay = ((t.title + " " + t.tag) + " " + subs.join(" ")).toLowerCase();
+        if (q && !hay.includes(q)) return;
+        const isCur = current === -3 && currentTopicSlug === t.slug && !isOTF(t.slug);
+        const list = [{ kind: "full", cur: isCur }].concat(subs.map((label, si) => ({ kind: "sub", si: si, label: label, cur: isCur && currentSub === si })));
+        addGroup("t" + t.slug, "📘 " + t.title, list, it => {
+          if (it.kind === "full") {
+            const f = document.createElement("div");
+            f.className = "sub-item full" + (it.cur ? " active" : "");
+            f.innerHTML = '<span class="sub-bullet">🔖</span><span class="sub-txt">' + escText(t.title) + ' — Full Page</span>';
+            f.current = it.cur;
+            f.addEventListener("click", () => loadTopic(t.slug));
+            return f;
+          }
+          const s = document.createElement("div");
+          s.className = "sub-item" + (it.cur ? " active" : "");
+          s.title = it.label;
+          s.innerHTML = '<span class="sub-bullet">→</span><span class="sub-txt">' + escText(it.label) + "</span>";
+          s.addEventListener("click", () => loadTopic(t.slug, it.si));
+          return s;
+        });
+      });
+    });
+  }
+  if (!inTopics || searching) {
+    const labItems = LAB_MODULES.filter(m => !q || (m.title + " " + m.tagline).toLowerCase().includes(q)).map(m => {
+      const isCur = current === -13 && currentLabSlug === m.slug;
+      return { kind: "lab", m: m, cur: isCur };
+    });
+    addGroup("labs80", "🎯 80 Practical Tasks", labItems, it => {
+      const f = document.createElement("div");
+      f.className = "sub-item full lab-sub-item" + (it.cur ? " active" : "");
+      const total = it.m.range[1] - it.m.range[0] + 1;
+      f.innerHTML = '<span class="sub-bullet">' + it.m.emoji + '</span><span class="sub-txt">' + escText(it.m.title) +
+        ' <span class="lab-side-count">' + labModuleDone(it.m) + "/" + total + "</span></span>";
+      f.current = it.cur;
+      f.addEventListener("click", (e) => { e.stopPropagation(); loadLabModule(it.m.slug); });
+      f.addEventListener("mousedown", (e) => e.stopPropagation());
+      return f;
+    });
+  }
+  groups.sort((a, b) => Number(b.active) - Number(a.active));
+  groups.forEach(grp => {
+    const isOpen = searching || grp.active || sbMemOpen.has(grp.key);
     const g = document.createElement("div");
-    g.className = "group" + (isOpen ? " open" : "") + (hasCurrent ? " group-current" : "");
-    g.dataset.key = key;
+    g.className = "group" + (isOpen ? " open" : "") + (grp.active ? " group-current" : "");
+    g.dataset.key = grp.key;
     const title = document.createElement("div");
     title.className = "group-title";
-    title.innerHTML = '<span class="group-chev">▸</span><span class="group-txt">' + name + '</span><span class="group-count">' + items.length + "</span>";
+    title.innerHTML = '<span class="group-chev">▸</span><span class="group-txt">' + grp.name + '</span><span class="group-count">' + grp.items.length + "</span>";
     title.setAttribute("role", "button");
     title.tabIndex = 0;
-    title.addEventListener("click", () => sbToggle(key));
-    title.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); sbToggle(key); } });
+    title.addEventListener("click", () => sbToggle(grp.key));
+    title.addEventListener("keydown", ev => { if (ev.key === "Enter" || ev.key === " ") { ev.preventDefault(); sbToggle(grp.key); } });
     const body = document.createElement("div");
     body.className = "group-body";
-    items.forEach(it => body.appendChild(itemize(it)));
+    grp.items.forEach(it => body.appendChild(grp.itemize(it)));
     g.appendChild(title);
     g.appendChild(body);
     frag.appendChild(g);
-  };
-  TOPIC_GROUPS.forEach(grp => {
-    TOPICS.filter(t => grp.slugs.includes(t.slug)).forEach(t => {
-      const subs = topicSubs(t.slug);
-      if (!subs.length) return;
-      const hay = ((t.title + " " + t.tag) + " " + subs.join(" ")).toLowerCase();
-      if (q && !hay.includes(q)) return;
-      const isCur = current === -3 && currentTopicSlug === t.slug && !isOTF(t.slug);
-      const list = [{ kind: "full", cur: isCur }].concat(subs.map((label, si) => ({ kind: "sub", si: si, label: label, cur: isCur && currentSub === si })));
-      addGroup("t" + t.slug, "📘 " + t.title, list, it => {
-        if (it.kind === "full") {
-          const f = document.createElement("div");
-          f.className = "sub-item full" + (it.cur ? " active" : "");
-          f.innerHTML = '<span class="sub-bullet">🔖</span><span class="sub-txt">' + escText(t.title) + ' — Full Page</span>';
-          f.current = it.cur;
-          f.addEventListener("click", () => loadTopic(t.slug));
-          return f;
-        }
-        const s = document.createElement("div");
-        s.className = "sub-item" + (it.cur ? " active" : "");
-        s.title = it.label;
-        s.innerHTML = '<span class="sub-bullet">→</span><span class="sub-txt">' + escText(it.label) + "</span>";
-        s.addEventListener("click", () => loadTopic(t.slug, it.si));
-        return s;
-      });
-    });
   });
   els.navGroups.replaceChildren(frag);
   updateProgressBar();
@@ -508,7 +581,9 @@ function renderMarkdown(md) {
     .replace(/<a href="(capstone\/day-[0-9][0-9][^"]+\.md)"/g, '<a href="#$1" data-internal="1"')
     .replace(/<a href="(?:\.\.\/)?expanded\/(day-[0-9][0-9][^"]+\.md)"/g, '<a href="#expanded/$1" data-internal="1"')
     .replace(/<a href="(topics\/[^"]+\.md)"/g, (m, f) => '<a href="#' + f.replace(/^topics\//, "topic-").replace(/\.md$/, "") + '" data-internal="1"')
-    .replace(/<a href="(?:\.\.\/)?modules\/([^"]+\.md)"/g, (m, f) => '<a href="#module-' + f.replace(/\.md$/, "") + '" data-internal="1"');
+    .replace(/<a href="(?:\.\.\/)?modules\/([^"]+\.md)"/g, (m, f) => '<a href="#module-' + f.replace(/\.md$/, "") + '" data-internal="1"')
+    .replace(/<a href="(module-\d+-[^"#]+\.md)(#[^"]*)?"/g, (m, f, anchor) =>
+      '<a href="#labs-' + f.replace(/\.md$/, "") + (anchor ? "/" + anchor.replace(/^#/, "") : "") + '" data-internal="1"');
 }
 
 function findDayByFile(file) {
@@ -894,6 +969,11 @@ function loadStart() {
         })() +
       "</div>" +
 
+      '<h2 class="dash-sec-title">🎯 Hands-On Labs<span class="sec-note"> (80 practical Ubuntu tasks — job-ready)</span></h2>' +
+      '<div class="dash-grid">' +
+        dashTile("labs", "🎯", "80 Practical Tasks", labsOverall().done + "/80 done · 12 modules · Ubuntu roadmap") +
+      "</div>" +
+
       '<h2 class="dash-sec-title">📚 Independent Deep Dives<span class="sec-note"> (day se alag — standalone topics)</span></h2>' +
       '<div class="dash-grid dash-topics">' +
         TOPICS.map(t => '<button class="dash-tile mini" data-topic="' + t.slug + '" title="' + (t.desc || t.tag) + '"><span class="dt-emoji">▸</span><span class="dt-name">' + t.title.replace(/ Deep Dive$| Explained$| Basics$/, "") + "</span></button>").join("") +
@@ -921,6 +1001,7 @@ function loadStart() {
       else if (go === "interview") loadInterviews(null);
       else if (go === "study") loadStudyPage("hub");
       else if (go === "topics") loadTopicsDashboard();
+      else if (go === "labs") loadLabs();
       else if (go === "help") loadHelp();
       else if (go === "chat") toggleChat(true);
       else if (go === "palette") openPalette();
@@ -1117,6 +1198,145 @@ async function loadModule(slug) {
   }
 }
 
+/* ---------- 80 Practical Tasks — labs dashboard + module pages ---------- */
+function labCardHTML(m) {
+  const total = m.range[1] - m.range[0] + 1;
+  const done = labModuleDone(m);
+  const pct = Math.round(done / total * 100);
+  return '<a class="card mod-card' + (done === total ? " done" : "") + '" href="#labs-' + m.slug + '" onclick="loadLabModule(\'' + m.slug + "')\">" +
+    '<div><span class="card-num">' + m.emoji + " · " + m.range[0] + "-" + m.range[1] + '</span> <span class="card-type">' + done + "/" + total + "</span></div>" +
+    '<div class="card-title">' + escText(m.title) + "</div>" +
+    '<div class="card-sub">' + escText(m.tagline) + " · " + pct + "%</div>" +
+    '<div class="mod-card-bar"><div class="progress-bar" style="width:' + Math.max(pct, 4) + '%"></div></div>' +
+  "</a>";
+}
+function labHeadHTML(m) {
+  const i = LAB_MODULES.indexOf(m);
+  const prev = i > 0 ? LAB_MODULES[i - 1] : null;
+  const next = i < LAB_MODULES.length - 1 ? LAB_MODULES[i + 1] : null;
+  const total = m.range[1] - m.range[0] + 1;
+  const done = labModuleDone(m);
+  const pct = Math.round(done / total * 100);
+  return '<div class="mod-head lab-head" id="labHead">' +
+    '<a class="mod-back" href="#labs">← 80 Tasks Dashboard</a>' +
+    '<div class="mod-meta"><span class="mod-lvl">Tasks ' + m.range[0] + "-" + m.range[1] + '</span><span class="mod-tagline">' + escText(m.tagline) + "</span></div>" +
+    '<div class="lab-progress-box"><div class="mod-progress"><div class="progress-bar" id="labProgressBar" style="width:' + Math.max(pct, 6) + '%"></div></div><div class="lab-progress-text" id="labProgressText">' + done + "/" + total + " · " + pct + "%</div></div>" +
+    '<div class="lab-nav">' +
+      (prev ? '<a class="chiphref" href="#labs-' + prev.slug + '" data-internal="1">← ' + escText(prev.title) + "</a>" : "<span></span>") +
+      (next ? '<a class="chiphref" href="#labs-' + next.slug + '" data-internal="1">' + escText(next.title) + " →</a>" : "<span></span>") +
+    "</div>" +
+  "</div>";
+}
+function updateLabHead() {
+  if (current !== -13) return;
+  const m = LAB_MODULES.find(x => x.slug === currentLabSlug);
+  if (!m) return;
+  const bar = document.getElementById("labProgressBar");
+  const txt = document.getElementById("labProgressText");
+  if (!bar) return;
+  const total = m.range[1] - m.range[0] + 1;
+  const done = labModuleDone(m);
+  const pct = Math.round(done / total * 100);
+  bar.style.width = Math.max(pct, 6) + "%";
+  if (txt) txt.textContent = done + "/" + total + " · " + pct + "%";
+}
+function headingSlug(text) {
+  return String(text || "").toLowerCase().replace(/[^a-z0-9\s-]/g, "").trim().replace(/\s+/g, "-");
+}
+function loadLabs() {
+  current = -12;
+  currentLabSlug = "";
+  setSideNav(false);
+  window.location.hash = "labs";
+  els.footnav.hidden = true;
+  els.markDoneBtn.style.display = "none";
+  els.content.classList.remove("markdown-body");
+  renderSidebar();
+  const ov = labsOverall();
+  els.content.innerHTML =
+    '<div class="landing topics-dash labs80-dash">' +
+      '<div class="hero hero-min td-hero">' +
+        "<h1>🎯 80 Practical DevOps Tasks</h1>" +
+        "<p><strong>Ubuntu-based, beginner to job-ready.</strong> Har task me scenario, command plan, verification aur troubleshoot hai. Sab practice <code>~/devops-lab</code> ya ek dedicated VM me karo — production paths ko bina samjhe mat chhedo.</p>" +
+        '<div class="hero-progress"><div class="progress-bar" style="width:' + Math.max(ov.pct, 6) + '%"><span>' + ov.done + "/" + ov.total + " tasks · " + ov.pct + "%</span></div></div>" +
+        '<p class="hero-min-tip">🧩 12 modules · 80 tasks · progress yahan alag save hota hai (50-day aur topics se independent)</p>' +
+      "</div>" +
+      '<div class="track-split">' +
+        '<div class="track-box"><b>🚀 DevOps in 50 Days</b><span>Day-wise full course — Linux se Azure, CI/CD, K8s tak.</span><a class="chiphref" href="#start">Course home →</a></div>' +
+        '<div class="track-box active"><b>🎯 80 Practical Tasks — aap yahan hain</b><span>Task-based roadmap: har module me 4-10 hands-on tasks, verify karke aage badho.</span></div>' +
+      "</div>" +
+      '<div class="mod-toolbar">' +
+        '<div class="mod-stats">' +
+          '<span class="chip-stat">🎯 ' + LABS80_TOTAL + " tasks</span>" +
+          '<span class="chip-stat">🧩 ' + LAB_MODULES.length + " modules</span>" +
+          '<span class="chip-stat">✅ ' + ov.done + " done · " + ov.pct + "%</span>" +
+        "</div>" +
+        '<button class="reset-btn" id="labsResetBtn" title="Sirf 80-task roadmap ka progress reset">↺ Reset lab progress</button>' +
+      "</div>" +
+      '<div class="grid mod-grid">' + LAB_MODULES.map(labCardHTML).join("") + "</div>" +
+    "</div>";
+  const reset = document.getElementById("labsResetBtn");
+  if (reset) reset.addEventListener("click", () => {
+    if (confirm("Sirf 80 Practical Tasks ka progress delete karna hai? (50-day aur topics progress safe rahega)")) {
+      saveLabsProgress([]);
+      loadLabs();
+    }
+  });
+  updateProgressBar();
+}
+async function loadLabModule(slug, anchor) {
+  const m = LAB_MODULES.find(x => x.slug === slug);
+  if (!m) return loadLabs();
+  current = -13;
+  currentLabSlug = slug;
+  currentLabAnchor = anchor || "";
+  setSideNav(true);
+  window.location.hash = "labs-" + slug + (currentLabAnchor ? "/" + currentLabAnchor : "");
+  els.footnav.hidden = true;
+  els.markDoneBtn.style.display = "none";
+  els.content.classList.add("markdown-body");
+  els.content.innerHTML = '<div class="loading">Loading lab module…</div>';
+  renderSidebar();
+  try {
+    let md = getContent(LABS80_DIR + slug + ".md");
+    if (md === null) {
+      const resp = await fetch("../" + LABS80_DIR + slug + ".md");
+      if (!resp.ok) throw new Error("Lab content nahi mili: " + slug);
+      md = await resp.text();
+    }
+    await pipeInto(md, -13, { hero: m.emoji + " PRACTICAL LAB — " + m.title });
+    const seg = document.getElementById("segNav");
+    if (seg) seg.remove();
+    const h1 = els.content.querySelector("h1");
+    if (h1) h1.insertAdjacentHTML("afterend", labHeadHTML(m));
+
+    Array.from(els.content.querySelectorAll("h1,h2,h3")).forEach(h => {
+      if (!h.id) h.id = headingSlug(h.textContent);
+    });
+    Array.from(els.content.querySelectorAll("h2")).forEach(h => {
+      const mm = h.textContent.match(/^Task\s+(\d+)\s*:/i);
+      if (!mm) return;
+      const n = parseInt(mm[1], 10);
+      const label = document.createElement("label");
+      label.className = "lab-task-done" + (isLabTaskDone(n) ? " done" : "");
+      label.innerHTML = '<input type="checkbox" class="lab-task-cb" data-task="' + n + '"' +
+        (isLabTaskDone(n) ? " checked" : "") + "> <span>Task " + n + " complete</span>";
+      h.insertAdjacentElement("afterend", label);
+    });
+    els.content.querySelectorAll("input.task-cb").forEach(cb => {
+      cb.disabled = true;
+      cb.title = "Per-task checkbox use karo (task ke neeche)";
+    });
+    updateLabHead();
+    if (currentLabAnchor) {
+      const el = document.getElementById(currentLabAnchor);
+      if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+  } catch (err) {
+    els.content.innerHTML = '<div class="notice">❌ ' + escText(err.message) + '</div><button class="cta" onclick="App.loadLabs()">← Back to 80 Tasks</button>';
+  }
+}
+
 function activateSeg(seg, setHash) {
   if (["learn", "practice", "platform", "cards", "quiz"].indexOf(seg) < 0) return;
   const link = els.content.querySelector('#segNav .seg-nav-link[data-seg="' + seg + '"]');
@@ -1251,6 +1471,12 @@ function paletteSections() {
       hint: "L" + m.level + " · " + m.tagline + (modulePct(m.slug) ? " · " + modulePct(m.slug) + "%" : ""),
       go: () => loadModule(m.slug)
     })) },
+    { group: "80 Practical Tasks (Ubuntu)", items: LAB_MODULES.map(m => ({
+      num: m.emoji,
+      title: m.title,
+      hint: "Tasks " + m.range[0] + "-" + m.range[1] + " · " + m.tagline + " · " + labModuleDone(m) + "/" + (m.range[1] - m.range[0] + 1),
+      go: () => loadLabModule(m.slug)
+    })) },
     { group: "Actions", items: [
       { num: "🧠", title: "Study Room (flashcards + quiz + map)", hint: "spaced repetition", go: () => loadStudyPage("hub") },
       { num: "🎴", title: "Flashcards", hint: "Quick Notes se bane cards", go: () => loadStudyPage("cards") },
@@ -1260,6 +1486,7 @@ function paletteSections() {
       { num: "📥", title: "Import progress (JSON)", hint: "backup wapas laao", go: () => window.Study && window.Study.importJSON() },
       { num: "⌂", title: "Start Here (Home)", hint: "landing page", go: () => loadStart() },
       { num: "🗂️", title: "DevOps Topics Dashboard", hint: "40 independent topic modules — 50-day se alag", go: () => loadTopicsDashboard() },
+      { num: "🎯", title: "80 Practical Tasks Dashboard", hint: "Ubuntu hands-on roadmap — 12 modules, 80 tasks", go: () => loadLabs() },
       { num: "🎯", title: "Interview Q&A (all days)", hint: "questions + tricky", go: () => loadInterviews(null) },
       { num: "🧪", title: "Practice Lab (sandbox terminal)", hint: "dummy cloud practice", go: () => loadLab() },
       { num: "💡", title: "Help & Debug", hint: "problem? yahan dekho", go: () => loadHelp() },
@@ -1345,11 +1572,12 @@ function srchIndex() {
     days: DAYS.map(d => ({ d, words: new Set(srchWords((d.title + " " + d.short + " " + (getContent(d.file) || "")))) })),
     exp: EXP_DAYS.map(d => ({ d, words: new Set(srchWords((d.title + " " + d.short + " " + (getContent(d.file) || "")))) })),
     modules: TOPIC_MODULES.map(m => ({ m, words: new Set(srchWords((m.title + " " + m.tagline + " " + (getContent("modules/" + m.slug + ".md") || "")))) })),
+    labs: LAB_MODULES.map(m => ({ m, words: new Set(srchWords((m.title + " " + m.tagline + " " + (getContent(LABS80_DIR + m.slug + ".md") || "")))) })),
   };
   return _SRCH;
 }
 function topSearchHits(q) {
-  const { topics, days, exp, modules } = srchIndex();
+  const { topics, days, exp, modules, labs } = srchIndex();
   const isNum = /^\d+$/.test(q);
   const tRank = (x) => {
     const t = x.t;
@@ -1361,6 +1589,14 @@ function topSearchHits(q) {
   const mRank = (x) => {
     const m = x.m;
     if ((m.title + " " + m.tagline + " " + m.slug).toLowerCase().includes(q)) return 0;
+    if (!isNum && [...x.words].some(w => w.startsWith(q))) return 3;
+    return 99;
+  };
+  const lRank = (x) => {
+    const m = x.m;
+    const n = parseInt(q, 10);
+    if ((m.title + " " + m.tagline + " " + m.slug).toLowerCase().includes(q)) return 0;
+    if (isNum && n >= m.range[0] && n <= m.range[1]) return 0;
     if (!isNum && [...x.words].some(w => w.startsWith(q))) return 3;
     return 99;
   };
@@ -1379,10 +1615,11 @@ function topSearchHits(q) {
   const pick = (arr, rankFn) => arr.map(x => ({ x, r: rankFn(x) })).filter(v => v.r < 9).sort((a, b) => a.r - b.r || 0).slice(0, 8).map(v => v.x);
   return {
     modules: pick(modules, mRank).slice(0, 5),
+    labs: pick(labs, lRank).slice(0, 5),
     topics: pick(topics, tRank),
     days: pick(days, dRank).slice(0, 6),
     exp: pick(exp, eRank).slice(0, 4),
-    actions: paletteSections()[2].items.filter(a => (a.title + " " + a.hint).toLowerCase().includes(q)).slice(0, 3),
+    actions: paletteSections()[5].items.filter(a => (a.title + " " + a.hint).toLowerCase().includes(q)).slice(0, 3),
   };
 }
 function renderTopDrop() {
@@ -1390,9 +1627,10 @@ function renderTopDrop() {
   const drop = document.getElementById("topSearchDrop");
   const q = (inp.value || "").trim().toLowerCase();
   if (!q) { drop.hidden = true; drop.innerHTML = ""; return; }
-  const { topics, days, exp, actions, modules } = topSearchHits(q);
+  const { topics, days, exp, actions, modules, labs } = topSearchHits(q);
   const groups = [];
   if (modules.length) groups.push({ name: "DevOps Topics", items: modules.map(x => ({ num: x.m.emoji, title: x.m.title + " (topic module)", hint: "L" + x.m.level + " · " + x.m.tagline, go: () => loadModule(x.m.slug) })) });
+  if (labs.length) groups.push({ name: "80 Practical Tasks", items: labs.map(x => ({ num: x.m.emoji, title: x.m.title, hint: "Tasks " + x.m.range[0] + "-" + x.m.range[1] + " · " + x.m.tagline, go: () => loadLabModule(x.m.slug) })) });
   if (topics.length) groups.push({ name: "Deep Dives", items: topics.map(x => ({ num: "📚", title: x.t.title, hint: x.t.tag + " · " + x.t.days.map(d => "Day " + d).join(" & "), go: () => loadTopic(x.t.slug) })) });
   if (days.length) groups.push({ name: "Days", items: days.map(x => ({ num: "D" + x.d.num, title: "Day " + x.d.num + ": " + x.d.title, hint: (x.d.week > 0 ? "Week " + x.d.week : x.d.week === 0 ? "Capstone" : "Setup") + " · " + x.d.type, go: () => loadDay(x.d.num) })) });
   if (exp.length) groups.push({ name: "Detailed Days", items: exp.map(x => ({ num: "📗" + x.d.n, title: "Detailed " + x.d.title, hint: (EXP_PHASES.find(p => p.key === x.d.phase) || { name: "" }).name + " · " + x.d.type, go: () => loadExpanded(x.d.n) })) });
@@ -1628,6 +1866,11 @@ els.prevBtn.addEventListener("click", () => {
   else if (current === -5) loadLab();
   else if (current === -2) loadStart();
   else if (current === -11) loadTopicsDashboard();
+  else if (current === -13) {
+    const i = LAB_MODULES.findIndex(x => x.slug === currentLabSlug);
+    if (i > 0) loadLabModule(LAB_MODULES[i - 1].slug); else loadLabs();
+  }
+  else if (current === -12) loadStart();
   else if (current === -8) loadStart();
   else if (current <= 0) loadStart();
   else if (current >= 1000) {
@@ -1642,6 +1885,11 @@ els.nextBtn.addEventListener("click", () => {
   else if (current === -5) loadStart();
   else if (current === -2) loadDay(1);
   else if (current === -10 || current === -11) loadStart();
+  else if (current === -13) {
+    const i = LAB_MODULES.findIndex(x => x.slug === currentLabSlug);
+    if (i >= 0 && i < LAB_MODULES.length - 1) loadLabModule(LAB_MODULES[i + 1].slug); else loadLabs();
+  }
+  else if (current === -12) loadStart();
   else if (current === -8) loadStart();
   else if (current >= 1000) {
     const d = EXP_DAYS.find(x => x.n === current - 1000 + 1);
@@ -1670,6 +1918,8 @@ els.resetBtn.addEventListener("click", () => {
     else if (current === -5) loadLab();
     else if (current === -10) loadTopicsDashboard();
     else if (current === -11) loadModule(currentModuleSlug);
+    else if (current === -12) loadLabs();
+    else if (current === -13) loadLabModule(currentLabSlug);
     else if (current === -8) loadStudyPage("hub");
     else if (current >= 1000) loadExpanded(current - 1000);
     else loadDay(current);
@@ -1682,10 +1932,16 @@ const interviewBtn = document.getElementById("interviewBtn");
 if (interviewBtn) interviewBtn.addEventListener("click", () => loadInterviews(null));
 const topicsBtn = document.getElementById("topicsBtn");
 if (topicsBtn) topicsBtn.addEventListener("click", () => loadTopicsDashboard());
+const labsBtn = document.getElementById("labsBtn");
+if (labsBtn) labsBtn.addEventListener("click", () => loadLabs());
 const studyBtn = document.getElementById("studyBtn");
 if (studyBtn) studyBtn.addEventListener("click", () => loadStudyPage("hub"));
 const sideStudyBtn = document.getElementById("sideStudyBtn");
 if (sideStudyBtn) sideStudyBtn.addEventListener("click", () => loadStudyPage("hub"));
+const labBtn = document.getElementById("labBtn");
+if (labBtn) labBtn.addEventListener("click", () => {
+  window.open("../demos/25-linux-logging-networking-lab/README.md", "_blank");
+});
 
 /* ---------- Mobile drawer (sidebar is display:none below 980px) ---------- */
 (function mobileNav() {
@@ -1733,6 +1989,19 @@ els.content.addEventListener("change", ev => {
   updateModuleHead();
 });
 
+/* 80 Practical Tasks — per-task checkboxes (alag progress key) */
+els.content.addEventListener("change", ev => {
+  const cb = ev.target;
+  if (!cb.classList.contains("lab-task-cb") || current !== -13) return;
+  const n = parseInt(cb.dataset.task, 10);
+  if (!n) return;
+  toggleLabTask(n, cb.checked);
+  const label = cb.closest(".lab-task-done");
+  if (label) label.classList.toggle("done", cb.checked);
+  updateLabHead();
+  renderSidebar();
+});
+
 /*---------- keyboard shortcuts ----------*/
 document.addEventListener("keydown", ev => {
   const typing = /INPUT|TEXTAREA/.test(document.activeElement.tagName);
@@ -1763,6 +2032,12 @@ function init() {
   if (hash === "#learn") return loadLearn();
   if (hash === "#platform") return loadPlatform();
   if (hash === "#topics") return loadTopicsDashboard();
+  if (hash === "#labs") return loadLabs();
+  if (hash && hash.startsWith("#labs-")) {
+    const rest = hash.slice(6);
+    const parts = rest.split("/");
+    return loadLabModule(parts[0], parts[1] || "");
+  }
   if (hash === "#study") return loadStudyPage("hub");
   if (hash === "#cards") return loadStudyPage("cards");
   if (hash === "#quiz") return loadStudyPage("quiz");
@@ -1785,6 +2060,7 @@ function init() {
 window.App = {
   DAYS, TOPICS, EXP_DAYS, EXP_PHASES, TOPIC_MODULES, TOPIC_LEVELS, getProgress, isDone, isExpDone, current: () => current,
   loadDay, loadExpanded, loadStart, loadHelp, loadTopic, loadInterviews, loadLab, loadTopicsDashboard, loadModule, modulePct,
+  loadLabs, loadLabModule, labsOverall, labModuleDone,
   loadStudyPage, openPalette, toggleChat, nextUndone, gotoSeg, moduleTotal, moduleDone,
   hash: () => window.location.hash,
 };
@@ -1808,6 +2084,15 @@ window.addEventListener("hashchange", () => {
   if (h === "#learn") { if (current !== -6) loadLearn(); return; }
   if (h === "#platform") { if (current !== -7) loadPlatform(); return; }
   if (h === "#topics") { if (current !== -10) loadTopicsDashboard(); return; }
+  if (h === "#labs") { if (current !== -12) loadLabs(); return; }
+  if (h && h.startsWith("#labs-")) {
+    const parts = h.slice(6).split("/");
+    const slug = parts[0], anchor = parts[1] || "";
+    if (!(current === -13 && currentLabSlug === slug && currentLabAnchor === anchor)) {
+      loadLabModule(slug, anchor);
+    }
+    return;
+  }
   if (h === "#study" || h === "#cards" || h === "#quiz" || h === "#graph") {
     if (current !== -8) loadStudyPage("hub");
     return;

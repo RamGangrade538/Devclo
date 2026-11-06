@@ -1086,6 +1086,29 @@ hr { border: none; border-top: 1px solid var(--border); margin: 26px 0; }
 }
 .mod-back:hover { text-decoration: underline; }
 
+/* ---- 80 practical tasks (labs) ---- */
+.lab-progress-box { margin-left: auto; width: min(360px, 100%); display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
+.lab-progress-box .mod-progress { width: 100%; max-width: none; margin-left: 0; }
+.lab-progress-text { font-size: 11.5px; font-weight: 700; color: var(--muted); }
+.lab-nav { display: flex; justify-content: space-between; gap: 12px; margin-top: 10px; font-size: 12.5px; }
+.lab-task-done {
+  display: inline-flex; align-items: center; gap: 8px;
+  margin: -4px 0 14px; padding: 6px 11px;
+  background: var(--surface); border: 1px dashed var(--border); border-radius: 999px;
+  font-size: 12px; font-weight: 700; color: var(--muted); cursor: pointer;
+  user-select: none;
+}
+.lab-task-done:hover { border-color: var(--accent); color: var(--text); }
+.lab-task-done.done { color: #16a34a; border-style: solid; border-color: rgba(22, 163, 74, .45); background: rgba(22, 163, 74, .08); }
+.lab-task-done input { accent-color: #16a34a; width: 15px; height: 15px; cursor: pointer; }
+.lab-side-count { float: right; margin-left: 6px; font-size: 10.5px; font-weight: 700; color: var(--muted); }
+.labs80-dash .mod-grid { grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+#nav .group[data-group="labs80"] .sub-item.full { cursor: pointer; user-select: none; position: relative; pointer-events: auto; z-index: 5; }
+#nav .group[data-group="labs80"] .sub-item.full:hover { background: rgba(14,165,233,.08); }
+#nav .group[data-group="labs80"] .sub-item.full.active { background: rgba(14,165,233,.12); }
+.lab-sub-item { display: flex; align-items: center; }
+.mod-grid .mod-card { cursor: pointer; }
+
 @media (max-width: 680px) {
   .track-split { grid-template-columns: 1fr; }
   .td-hero h1 { font-size: 20px; }

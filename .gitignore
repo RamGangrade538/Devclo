@@ -1,0 +1,17 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+
+# Dependencies
+node_modules/
+
+# Build/typecheck artifacts
+*.tsbuildinfo
+
+# Logs and temp files
+*.log
+
+# Large downloaded archives and extracted binaries
+*.tar.gz
+*.zip
+devops/demos/24-prometheus-grafana/native/

@@ -1,0 +1,47 @@
+groups:
+  - name: demo-alerts
+    rules:
+      - alert: DemoAppDown
+        expr: up{job="demo-app"} == 0
+        for: 30s
+        labels:
+          severity: critical
+        annotations:
+          summary: "Demo app down hai"
+          description: "{{ $labels.instance }} 30s se reachable nahi hai."
+
+      - alert: HighErrorRate
+        expr: |
+          sum(rate(demo_errors_total[1m]))
+          /
+          clamp_min(sum(rate(demo_http_requests_total[1m])), 0.001)
+          > 0.2
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Error rate 20% se upar"
+          description: "Pichle 1 min me error ratio {{ $value | humanizePercentage }}."
+
+      - alert: HighP95Latency
+        expr: |
+          histogram_quantile(
+            0.95,
+            sum(rate(demo_request_latency_seconds_bucket[1m])) by (le)
+          ) > 0.5
+        for: 1m
+        labels:
+          severity: warning
+        annotations:
+          summary: "p95 latency 500ms se upar"
+          description: "p95 = {{ $value }}s."
+
+      - alert: NodeHighCPU
+        expr: |
+          100 - (avg(rate(node_cpu_seconds_total{mode="idle"}[1m])) * 100) > 85
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host CPU 85% se upar"
+          description: "CPU usage = {{ $value | printf \"%.1f\" }}%"

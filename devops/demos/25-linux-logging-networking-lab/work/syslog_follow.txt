@@ -1,0 +1,12 @@
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course[129739]: Day-1 lab: entry via systemd-cat (direct journal)
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course: disk usage 85% - warning
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course: db connection failed - error
+Oct 22 13:25:14 JAVU-DKTP-054 lab-course: live entry 1
+Oct 22 13:25:14 JAVU-DKTP-054 lab-course: live entry 2
+Oct 22 13:25:16 JAVU-DKTP-054 payment-service[129829]: payment order_id=42 status=failed reason=timeout
+Oct 22 13:25:16 JAVU-DKTP-054 payment-service[129830]: payment order_id=43 status=ok
+Oct 22 13:25:16 JAVU-DKTP-054 lab-course: lab: local0.info entry
+Oct 22 13:25:16 JAVU-DKTP-054 lab-course: lab: local0.warning entry
+Oct 22 13:25:16 JAVU-DKTP-054 lab-course: lab: local0.err entry
+Oct 22 13:25:17 JAVU-DKTP-054 lab-course: live syslog line 1
+Oct 22 13:25:17 JAVU-DKTP-054 lab-course: live syslog line 2

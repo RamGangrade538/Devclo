@@ -1,0 +1,13 @@
+-- Logs begin at Wed 2026-03-11 19:25:53 IST. --
+Oct 22 13:23:47 JAVU-DKTP-054 lab-course[125963]: live entry 2
+Oct 22 13:23:55 JAVU-DKTP-054 lab-course[126159]: lab: local0.info entry
+Oct 22 13:23:55 JAVU-DKTP-054 lab-course[126160]: lab: local0.warning entry
+Oct 22 13:23:55 JAVU-DKTP-054 lab-course[126161]: lab: local0.err entry
+Oct 22 13:23:56 JAVU-DKTP-054 lab-course[126281]: live syslog line 1
+Oct 22 13:23:56 JAVU-DKTP-054 lab-course[126282]: live syslog line 2
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course[129738]: Day-1 lab: first journal entry
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course[129739]: Day-1 lab: entry via systemd-cat (direct journal)
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course[129741]: disk usage 85% - warning
+Oct 22 13:25:12 JAVU-DKTP-054 lab-course[129742]: db connection failed - error
+Oct 22 13:25:14 JAVU-DKTP-054 lab-course[129790]: live entry 1
+Oct 22 13:25:14 JAVU-DKTP-054 lab-course[129791]: live entry 2
