@@ -1,0 +1,29 @@
+{
+  "name": "ecommerce",
+  "private": true,
+  "version": "0.1.0",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "npm run dev --workspace=@ecommerce/api & npm run dev --workspace=@ecommerce/web",
+    "dev:api": "npm run dev --workspace=@ecommerce/api",
+    "dev:web": "npm run dev --workspace=@ecommerce/web",
+    "build": "npm run build --workspace=@ecommerce/shared && npm run build --workspace=@ecommerce/api && npm run build --workspace=@ecommerce/web",
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "db:generate": "npm run db:generate --workspace=@ecommerce/api",
+    "db:migrate": "npm run db:migrate --workspace=@ecommerce/api",
+    "db:seed": "npm run db:seed --workspace=@ecommerce/api",
+    "db:studio": "npm run db:studio --workspace=@ecommerce/api",
+    "infra:up": "docker compose up -d",
+    "infra:down": "docker compose down"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "openai": "^6.49.0"
+  }
+}
